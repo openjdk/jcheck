@@ -1,8 +1,8 @@
 #! /bin/bash
 
-rm -rf test
-hg init test
-cd test
+rm -rf tests
+hg init tests
+cd tests
 
 date >date
 HGUSER=setup hg ci -Am '1000000: Init'
