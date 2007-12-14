@@ -136,3 +136,9 @@ Reviewed-by: duke"
 
 fail ci -m "$(bugid): That's some	bug
 Reviewed-by: duke"
+
+fail ci -m "$(bugid): Buggy bug bug bug
+Reviewed-by: fang"
+
+test fang ci -m "$(bugid): Buggy bug bug bug
+Reviewed-by: beelzebub"

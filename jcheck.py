@@ -37,6 +37,10 @@ def oneline(ctx):
                             timezone=False),
                ctx.description().splitlines()[0]))
 
+# ## Stub: This will eventually query the db
+def validate_author(an):
+    return an != "fang"
+
 badwhite_re = re.compile("\t|([ \t]$)|\r", re.MULTILINE)
 
 base_addr_pat = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
@@ -57,14 +61,19 @@ def bug_validate(ch, ctx, m):
     if b < 1000000:
         return "Bugid out of range"
     if b in ch.bugids:
-        return "Bugid %d used multiple times in this changeset" % b
+        ch.error(ctx, "Bugid %d used multiple times in this changeset" % b)
     ch.bugids.append(b)
     if b in ch.repo_bugids:
         r = ch.repo_bugids[b]
         if r < ctx.rev():
-            return ("Bugid %d already used in this repository, in revision %d "
-                    % (b, r))
-    return None
+            ch.error(ctx, ("Bugid %d already used in this repository, in revision %d "
+                           % (b, r)))
+
+def rev_validate(ch, ctx, m):
+    ans = re.split(", *", m.group(1))
+    for an in ans:
+        if not validate_author(an):
+            ch.error(ctx, "Invalid reviewer name: %s" % an)
 
 class State:
     def __init__(self, name, ident_pattern, check_pattern,
@@ -82,7 +91,7 @@ comment_grammar = [
     State("change summary",
           sum_ident, sum_check, min=0, max=1),
     State("reviewer attribution",
-          rev_ident, rev_check, min=1, max=1),
+          rev_ident, rev_check, validator=rev_validate, min=1, max=1),
     State("contributor attribution",
           con_ident, con_check, min=0, max=1)
 ]
@@ -138,7 +147,8 @@ class checker(object):
 
     def c_00_author(self, ctx):
         self.ui.debug("author: %s\n" % ctx.user())
-        # Validate author name
+        if not validate_author(ctx.user()):
+            self.error(ctx, "Invalid changeset author")
 
     def c_01_comment(self, ctx):
         if badwhite_re.search(ctx.description()):
@@ -158,9 +168,7 @@ class checker(object):
                 if not m:
                     self.error(ctx, "Invalid %s" % st.name)
                 elif st.validator:
-                    v = st.validator(self, ctx, m)
-                    if v:
-                        self.error(ctx, v)
+                    st.validator(self, ctx, m)
                 n = n + 1
                 i = i + 1
                 if i >= len(lns):
