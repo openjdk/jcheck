@@ -37,6 +37,8 @@ def oneline(ctx):
                             timezone=False),
                ctx.description().splitlines()[0]))
 
+badwhite_re = re.compile("\t|([ \t]$)|\r", re.MULTILINE)
+
 base_addr_pat = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
 addr_pat = ("(" + base_addr_pat + ")"
             + "|(([-_ a-zA-Z0-9]+) +<" + base_addr_pat + ">)")
@@ -139,6 +141,8 @@ class checker(object):
         # Validate author name
 
     def c_01_comment(self, ctx):
+        if badwhite_re.search(ctx.description()):
+            self.error(ctx, "Bad whitespace in comment")
         lns = ctx.description().splitlines()
         self.ui.debug("comment: %s\n" % lns[0])
 

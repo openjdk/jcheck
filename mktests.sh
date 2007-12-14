@@ -122,3 +122,17 @@ b=$(bugid)
 fail ci -m "$b: Duplicate bugid in changeset
 $b: Duplicate bugid in changeset
 Reviewed-by: duke"
+
+# hg seems to strip trailing whitespace,
+# at least for comments given with -m
+pass ci -m "$(bugid): That's some bug 
+Reviewed-by: duke"
+
+pass ci -m "$(bugid): That's some bug
+Reviewed-by: duke "
+
+pass ci -m "$(bugid): That's some bug
+Reviewed-by: duke"
+
+fail ci -m "$(bugid): That's some	bug
+Reviewed-by: duke"
