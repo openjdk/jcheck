@@ -37,6 +37,9 @@ def oneline(ctx):
                             timezone=False),
                ctx.description().splitlines()[0]))
 
+def is_merge(repo, rev):
+    return not (-1 in repo.changelog.parentrevs(rev))
+
 # ## Stub: This will eventually query the db
 def validate_author(an):
     return an != "fang"
@@ -153,8 +156,14 @@ class checker(object):
     def c_01_comment(self, ctx):
         if badwhite_re.search(ctx.description()):
             self.error(ctx, "Bad whitespace in comment")
+
+        if is_merge(self.repo, ctx.rev()):
+            if ctx.description() != "Merge":
+                self.error(ctx, ("Invalid comment for merge changeset"
+                                 + " (must be \"Merge\")"))
+            return
+
         lns = ctx.description().splitlines()
-        self.ui.debug("comment: %s\n" % lns[0])
 
         i = 0                           # Input index
         gi = 0                          # Grammar index

@@ -16,8 +16,10 @@ bugid() {
   echo $b
 }
 
+datefile=date
+
 test() {
-  date >>date; hg add
+  date >>$datefile; hg add --exclude 'z*'
   export HGUSER=$1; shift
   (set -x; hg "$@")
 }
@@ -25,6 +27,27 @@ test() {
 pass() { test pass "$@"; }
 fail() { test fail "$@"; }
 setup() { test setup "$@"; }
+
+
+# Merge-changeset comments
+
+setup ci -m "$(bugid): Bug to merge
+Reviewed-by: duke"
+hg bundle --base 0 -r 1 z
+hg rollback
+(datefile=date2 setup ci -m "$(bugid): Merge to bug
+Reviewed-by: duke")
+(export HGUSER=fail; set -x; hg fetch z)
+rm z
+
+setup ci -m "$(bugid): Bug to merge
+Reviewed-by: duke"
+hg bundle --base 3 -r 4 z
+hg rollback
+(datefile=date3 setup ci -m "$(bugid): Merge to bug
+Reviewed-by: duke")
+(export HGUSER=pass; set -x; hg fetch -m Merge z)
+rm z
 
 
 # Changeset comments
