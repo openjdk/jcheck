@@ -30,23 +30,51 @@ from mercurial import cmdutil, patch, util, context, templater
 Pass = False
 Fail = True
 
-addr_pat = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
-addr_re = re.compile("(^" + addr_pat + "$)"
-                     + "|((^[-_ a-zA-Z0-9]+) +<" + addr_pat + ">$)")
-
-def validate_addr(a):
-    return bool(addr_re.match(a))
-
-desc_pattern = re.compile("(([0-9]{7}): [^\[\]]*$)"
-                          "|(Reviewed-by: (([a-z0-9]+)(, [a-z0-9]+)*$))"
-                          "|(Contributed-by: ([^ ].*)$)")
-
 def oneline(ctx):
     return ("%d:%s by %s on %s: %s\n"
             % (ctx.rev(), short(ctx.node()), ctx.user(),
                util.datestr(ctx.date(), format="%Y-%m-%d %H:%M",
                             timezone=False),
                ctx.description().splitlines()[0]))
+
+base_addr_pat = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
+addr_pat = ("(" + base_addr_pat + ")"
+            + "|(([-_ a-zA-Z0-9]+) +<" + base_addr_pat + ">)")
+
+bug_ident = re.compile("([0-9]+):")
+bug_check = re.compile("([0-9]{7}): [^\[\]]*$")
+sum_ident = re.compile("Summary:")
+sum_check = re.compile("Summary: .*")
+rev_ident = re.compile("Reviewed-by:")
+rev_check = re.compile("Reviewed-by: (([a-z0-9]+)(, [a-z0-9]+)*$)")
+con_ident = re.compile("Contributed-by:")
+con_check = re.compile("Contributed-by: (" + addr_pat + ")$")
+
+def bug_validate(m):
+    if int(m.group(1)) < 1000000:
+        return "Bugid out of range"
+    return None
+
+class State:
+    def __init__(self, name, ident_pattern, check_pattern,
+                 validator=None, min=0, max=1):
+        self.name = name
+        self.ident_pattern = ident_pattern
+        self.check_pattern = check_pattern
+        self.validator = validator
+        self.min = min
+        self.max = max
+
+comment_grammar = [
+    State("bugid line",
+          bug_ident, bug_check, validator=bug_validate, min=1, max=1000),
+    State("change summary",
+          sum_ident, sum_check, min=0, max=1),
+    State("reviewer attribution",
+          rev_ident, rev_check, min=1, max=1),
+    State("contributor attribution",
+          con_ident, con_check, min=0, max=1)
+]
 
 class checker(object):
 
@@ -57,8 +85,6 @@ class checker(object):
         self.checks = [c for c in checker.__dict__ if c.startswith("c_")]
         self.checks.sort()
         self.summarized = False
-        self.current_check = None
-        self.failed_checks = { }
 
     def summarize(self, ctx):
         self.ui.warn("\n")
@@ -73,73 +99,63 @@ class checker(object):
     def error(self, ctx, msg):
         if not self.summarized:
             self.summarize(ctx)
-        self.ui.warn(msg)
-        self.failed_checks[self.current_check] = True
+        self.ui.warn(msg + "\n")
         self.rv = Fail
 
     def c_00_author(self, ctx):
         self.ui.debug("author: %s\n" % ctx.user())
 
-    def c_01_description(self, ctx):
-
-        """
-        Each line of a changeset comment must be of one of the following forms:
-
-          - A bug id, a colon, and the bug's synopsis:
-
-              1234567: Long.MAX_VALUE is too small
-
-            The bug id must not have been used previously.  The synopsis must
-            not include reviewer names in brackets.
-
-          - A reviewer attribution:
-
-              Reviewed-by: foo, bar
-
-            The names must be valid JDK author names.  A reviewer attribution
-            must follow a bug-id line.
-
-          - A contributor attribution:
-
-              Contributed-by: Ben Bitdiddle <ben@bits.org>
-
-            The e-mail address must be valid per RFC 822.  A contributor
-            attribution must follow a bug-id line or a reviewer attribution.
-        """
-
-        ## Should enforce order: Bug id, reviewers, contributor
+    def c_01_comment(self, ctx):
         lns = ctx.description().splitlines()
-        self.ui.debug("description: %s\n" % lns[0])
-        for ln in lns:
-            m = desc_pattern.match(ln)
-            if not m:
-                self.error(ctx, "Invalid comment line: %s\n" % ln)
-                continue
-            if m.group(7):
-                contributor = m.group(8)
-                if not validate_addr(contributor):
-                    self.error(ctx, ("Invalid contributor e-mail address: %s\n"
-                                     % contributor))
+        self.ui.debug("comment: %s\n" % lns[0])
+
+        i = 0                           # Input index
+        gi = 0                          # Grammar index
+        n = 0                           # Occurrence count
+        while i < len(lns):
+            if self.ui.debugflag:
+                print "## top [%d] %d %d" % (i, gi, n)
+            ln = lns[i]
+            st = comment_grammar[gi]
+            n = 0
+            while (st.ident_pattern.match(ln)):
+                m = st.check_pattern.match(ln)
+                if not m:
+                    self.error(ctx, "Invalid %s" % st.name)
+                elif st.validator:
+                    v = st.validator(m)
+                    if v:
+                        self.error(ctx, v)
+                n = n + 1
+                i = i + 1
+                if i >= len(lns):
+                    break;
+                ln = lns[i]
+            if n < st.min:
+                self.error(ctx, "Incomplete comment: Missing %s" % st.name)
+            if n > st.max:
+                self.error(ctx, "Too many %ss" % st.name)
+            gi = gi + 1
+            if gi >= len(comment_grammar):
+                break
+
+        if self.ui.debugflag:
+            print "## end [%d] %d %d" % (i, gi, n)
+        if (gi == 0 and n > 0):
+            self.error(ctx, "Incomplete comment: Missing bugid line")
+        elif gi == 1 or (gi == 2 and n == 0):
+            self.error(ctx, "Incomplete comment: Missing reviewer attribution")
+        if (i < len(lns)):
+            self.error(ctx, "Extraneous text")
 
     def check(self, node):
         self.summarized = False
         ctx = context.changectx(self.repo, node)
-#        self.ui.debug(oneline(ctx))
+        self.ui.debug(oneline(ctx))
         for c in self.checks:
             cf = checker.__dict__[c]
-            self.current_check = cf
             cf(self, ctx)
         return self.rv
-
-    def advise(self):
-        if self.ui.verbose and self.failed_checks:
-            fc = list(self.failed_checks.keys())
-            fc.sort()
-            for cf in fc:
-                advice = cf.__doc__
-                if advice:
-                    for ln in advice.splitlines():
-                        self.ui.warn(ln[8:] + "\n")
 
 ## broken right now
 def hook(ui, repo, hooktype, node=None, source=None, **kwargs):
@@ -173,7 +189,6 @@ def jcheck(ui, repo, **opts):
         elif st == 'iter':
             if ui.debugflag:
                 displayer.flush(rev)
-    ch.advise()
     return ch.rv
 
 opts = [("r", "rev", [], "check the specified revision or range (default: tip)")]

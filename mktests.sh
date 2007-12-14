@@ -5,7 +5,8 @@ hg init tests
 cd tests
 
 date >date
-HGUSER=setup hg ci -Am '1000000: Init'
+HGUSER=setup hg ci -Am '1000000: Init
+Reviewed-by: duke'
 
 echo 1000001 >.hg/bugid
 
@@ -28,47 +29,88 @@ setup() { test setup "$@"; }
 
 # Changeset comments
 
-pass ci -m "$(bugid): A random bug"
-
-pass ci -m "$(bugid): A random bug
-$(bugid): Another random bug"
-
-fail ci -m "$(bugid): A random bug
-foo bar baz"
-
-fail ci -m "$(bugid): A random bug [foo.bar]"
-fail ci -m "123456: A short bugid"
-fail ci -m "nobugid: No bugid"
 fail ci -m "Blah blah"
 
-pass ci -m "$(bugid): The next bug
-Reviewed-by: mr"
+pass ci -m "$(bugid): A random bug
+Reviewed-by: duke"
+
+fail ci -m " $(bugid): A random bug
+Reviewed-by: duke"
+
+fail ci -m "$(bugid):
+Reviewed-by: duke"
+
+fail ci -m "Reviewed-by: duke"
+
+fail ci -m "$(bugid): A random bug
+Blah blah
+Reviewed-by: duke"
+
+fail ci -m "$(bugid): A random bug"
+
+fail ci -m "$(bugid): A random bug
+Reviewed-by:"
+
+fail ci -m "$(bugid): A random bug
+Blah blah"
+
+fail ci -m "$(bugid): A random bug
+Reviewed-by: foo@bar.baz"
+
+fail ci -m "$(bugid): The next bug
+Reviewed-by: Ben Bitdiddle"
+
+pass ci -m "$(bugid): A random bug
+$(bugid): Another random bug
+Reviewed-by: duke"
+
+fail ci -m "$(bugid): A random bug [foo.bar]
+Reviewed-by: duke"
+
+fail ci -m "123456: A short bugid
+Reviewed-by: duke"
+
+fail ci -m "nobugid: No bugid
+Reviewed-by: duke"
 
 pass ci -m "$(bugid): The next bug
 Reviewed-by: mr, kgh"
 
 fail ci -m "$(bugid): The next bug
-Reviewed-by: "
+Reviewed-by: mr kgh"
 
-fail ci -m "$(bugid): The next bug
-Reviewed-by: Ben Bitdiddle"
-
-pass ci -m "$(bugid): Another bug
+fail ci -m "$(bugid): Another bug
 Contributed-by: Ben Bitdiddle <ben@bits.org>"
 
 pass ci -m "$(bugid): Another bug
+Reviewed-by: duke
 Contributed-by: ben@bits.org"
 
 pass ci -m "$(bugid): Another bug
-Reviewed-by: iag
+Reviewed-by: duke
 Contributed-by: Ben Bitdiddle <ben@bits.org>"
 
 fail ci -m "$(bugid): Another bug
+Reviewed-by: duke
 Contributed-by: Ben Bitdiddle"
 
 fail ci -m "$(bugid): Another bug
+Reviewed-by: duke
 Contributed-by: foo"
 
 fail ci -m "$(bugid): Another bug
 Reviewed-by:
-Contributed-by: foo"
+Contributed-by: ben@bits.org"
+
+pass ci -m "$(bugid): Yet another bug
+Summary: Rewrite code
+Reviewed-by: duke"
+
+fail ci -m "$(bugid): Yet another bug
+Summary: 
+Reviewed-by: duke"
+
+fail ci -m "$(bugid): Yet another bug
+Summary: Rewrite code
+
+Reviewed-by: duke"
