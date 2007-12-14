@@ -50,9 +50,18 @@ rev_check = re.compile("Reviewed-by: (([a-z0-9]+)(, [a-z0-9]+)*$)")
 con_ident = re.compile("Contributed-by:")
 con_check = re.compile("Contributed-by: (" + addr_pat + ")$")
 
-def bug_validate(m):
-    if int(m.group(1)) < 1000000:
+def bug_validate(ch, ctx, m):
+    b = int(m.group(1))
+    if b < 1000000:
         return "Bugid out of range"
+    if b in ch.bugids:
+        return "Bugid %d used multiple times in this changeset" % b
+    ch.bugids.append(b)
+    if b in ch.repo_bugids:
+        r = ch.repo_bugids[b]
+        if r < ctx.rev():
+            return ("Bugid %d already used in this repository, in revision %d "
+                    % (b, r))
     return None
 
 class State:
@@ -76,34 +85,58 @@ comment_grammar = [
           con_ident, con_check, min=0, max=1)
 ]
 
+def repo_bugids(ui, repo):
+    # Should cache this, eventually
+    get = util.cachefunc(lambda r: repo.changectx(r).changeset())
+    changeiter, matchfn = cmdutil.walkchangerevs(ui, repo, [], get,
+                                                 { "rev" : ["0:tip"] })
+    bugids = { }                        # bugid -> rev
+    for st, rev, fns in changeiter:
+        if st == 'add':
+            node = repo.changelog.node(rev)
+            ctx = context.changectx(repo, node)
+            lns = ctx.description().splitlines()
+            for ln in lns:
+                m = bug_ident.match(ln)
+                if m:
+                    b = int(m.group(1))
+                    if not b in bugids:
+                        bugids[b] = rev
+    if ui.debugflag:
+        ui.debug("Bugids: %s\n" % bugids)
+    return bugids
+
 class checker(object):
 
-    def __init__(self, ui, repo):
+    def __init__(self, ui, repo, repo_bugids):
         self.ui = ui
         self.repo = repo
         self.rv = Pass
         self.checks = [c for c in checker.__dict__ if c.startswith("c_")]
         self.checks.sort()
         self.summarized = False
+        self.repo_bugids = repo_bugids
+        self.bugids = [ ]               # Bugids in current changeset
 
     def summarize(self, ctx):
-        self.ui.warn("\n")
-        self.ui.warn("> Changeset: %d:%s\n" % (ctx.rev(), short(ctx.node())))
-        self.ui.warn("> Author:    %s\n" % ctx.user())
-        self.ui.warn("> Date:      %s\n" % templater.isodate(ctx.date()))
-        self.ui.warn(">\n> ")
-        self.ui.warn("\n> ".join(ctx.description().splitlines()))
-        self.ui.warn("\n\n")
+        self.ui.status("\n")
+        self.ui.status("> Changeset: %d:%s\n" % (ctx.rev(), short(ctx.node())))
+        self.ui.status("> Author:    %s\n" % ctx.user())
+        self.ui.status("> Date:      %s\n" % templater.isodate(ctx.date()))
+        self.ui.status(">\n> ")
+        self.ui.status("\n> ".join(ctx.description().splitlines()))
+        self.ui.status("\n\n")
         self.summarized = True
 
     def error(self, ctx, msg):
         if not self.summarized:
             self.summarize(ctx)
-        self.ui.warn(msg + "\n")
+        self.ui.status(msg + "\n")
         self.rv = Fail
 
     def c_00_author(self, ctx):
         self.ui.debug("author: %s\n" % ctx.user())
+        # Validate author name
 
     def c_01_comment(self, ctx):
         lns = ctx.description().splitlines()
@@ -113,8 +146,6 @@ class checker(object):
         gi = 0                          # Grammar index
         n = 0                           # Occurrence count
         while i < len(lns):
-            if self.ui.debugflag:
-                print "## top [%d] %d %d" % (i, gi, n)
             ln = lns[i]
             st = comment_grammar[gi]
             n = 0
@@ -123,7 +154,7 @@ class checker(object):
                 if not m:
                     self.error(ctx, "Invalid %s" % st.name)
                 elif st.validator:
-                    v = st.validator(m)
+                    v = st.validator(self, ctx, m)
                     if v:
                         self.error(ctx, v)
                 n = n + 1
@@ -139,8 +170,6 @@ class checker(object):
             if gi >= len(comment_grammar):
                 break
 
-        if self.ui.debugflag:
-            print "## end [%d] %d %d" % (i, gi, n)
         if (gi == 0 and n > 0):
             self.error(ctx, "Incomplete comment: Missing bugid line")
         elif gi == 1 or (gi == 2 and n == 0):
@@ -150,6 +179,7 @@ class checker(object):
 
     def check(self, node):
         self.summarized = False
+        self.bugids = [ ]
         ctx = context.changectx(self.repo, node)
         self.ui.debug(oneline(ctx))
         for c in self.checks:
@@ -177,7 +207,7 @@ def jcheck(ui, repo, **opts):
 
     if ui.debug:
         displayer = cmdutil.show_changeset(ui, repo, opts, True, matchfn)
-    ch = checker(ui, repo)
+    ch = checker(ui, repo, repo_bugids(ui, repo))
     for st, rev, fns in changeiter:
         if st == 'add':
             node = repo.changelog.node(rev)

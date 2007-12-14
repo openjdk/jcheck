@@ -114,3 +114,11 @@ fail ci -m "$(bugid): Yet another bug
 Summary: Rewrite code
 
 Reviewed-by: duke"
+
+fail ci -m "1000002: Duplicate bugid
+Reviewed-by: duke"
+
+b=$(bugid)
+fail ci -m "$b: Duplicate bugid in changeset
+$b: Duplicate bugid in changeset
+Reviewed-by: duke"
