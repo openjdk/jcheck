@@ -35,25 +35,8 @@ fail() { test fail "$@"; }
 setup() { test setup "$@"; }
 
 
-# File content
-
-echo 'alpha
-beta
-foo ' >trailing-space
-fail
-
-echo 'alpha
-beta
-foo' >carriage-return
-fail
-
-echo 'alpha
-beta
-foo	bar' >tab
-fail
-
-
 # Merge-changeset comments
+# THESE MUST BE FIRST since they refer to specific revision indices
 
 setup ci -m "$(bugid): Bug to merge
 Reviewed-by: duke"
@@ -72,6 +55,24 @@ hg rollback
 Reviewed-by: duke")
 (export HGUSER=pass; set -x; hg fetch -m Merge z)
 rm z
+
+
+# File content
+
+echo 'alpha
+beta
+foo ' >trailing-space
+fail
+
+echo 'alpha
+beta
+foo' >carriage-return
+fail
+
+echo 'alpha
+beta
+foo	bar' >tab
+fail
 
 
 # Changeset comments
