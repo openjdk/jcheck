@@ -47,7 +47,14 @@ def validate_author(an):
 
 # Comment validation
 
-badwhite_re = re.compile("\t|([ \t]$)|\r", re.MULTILINE)
+badwhite_re = re.compile("(\t)|([ \t]$)|\r", re.MULTILINE)
+
+def badwhite_what(m):
+    if m.group(1):
+        return "Tab character"
+    if m.group(2):
+        return "Trailing whitespace"
+    return "Carriage return (^M)"
 
 base_addr_pat = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
 addr_pat = ("(" + base_addr_pat + ")"
@@ -160,8 +167,10 @@ class checker(object):
             self.error(ctx, "Invalid changeset author")
 
     def c_01_comment(self, ctx):
-        if badwhite_re.search(ctx.description()):
-            self.error(ctx, "Bad whitespace in comment")
+        m = badwhite_re.search(ctx.description())
+        if m:
+            ln = ctx.description().count("\n", 0, m.start()) + 1
+            self.error(ctx, "%s in comment (line %d)" % (badwhite_what(m), ln))
 
         if is_merge(self.repo, ctx.rev()):
             if ctx.description() != "Merge":
@@ -214,8 +223,10 @@ class checker(object):
         for f in files:
             fx = ctx.filectx(f)
             data = fx.data()
-            if badwhite_re.search(data):
-                self.error(ctx, "%s: Bad whitespace in file" % f)
+            m = badwhite_re.search(data)
+            if m:
+                ln = data.count("\n", 0, m.start()) + 1
+                self.error(ctx, "%s:%d: %s" % (f, ln, badwhite_what(m)))
             ## check_file_header(self, fx, data)
 
     def check(self, node):

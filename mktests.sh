@@ -37,13 +37,19 @@ setup() { test setup "$@"; }
 
 # File content
 
-echo 'foo ' >trailing-space
+echo 'alpha
+beta
+foo ' >trailing-space
 fail
 
-echo 'foo' >carriage-return
+echo 'alpha
+beta
+foo' >carriage-return
 fail
 
-echo 'foo	bar' >tab
+echo 'alpha
+beta
+foo	bar' >tab
 fail
 
 
