@@ -44,6 +44,9 @@ def is_merge(repo, rev):
 def validate_author(an):
     return an != "fang"
 
+
+# Comment validation
+
 badwhite_re = re.compile("\t|([ \t]$)|\r", re.MULTILINE)
 
 base_addr_pat = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
@@ -64,7 +67,7 @@ def bug_validate(ch, ctx, m):
     if b < 1000000:
         return "Bugid out of range"
     if b in ch.bugids:
-        ch.error(ctx, "Bugid %d used multiple times in this changeset" % b)
+        ch.error(ctx, "Bugid %d used more than once in this changeset" % b)
     ch.bugids.append(b)
     if b in ch.repo_bugids:
         r = ch.repo_bugids[b]
@@ -119,6 +122,9 @@ def repo_bugids(ui, repo):
     if ui.debugflag:
         ui.debug("Bugids: %s\n" % bugids)
     return bugids
+
+
+# Checker class
 
 class checker(object):
 
@@ -197,6 +203,20 @@ class checker(object):
             self.error(ctx, "Incomplete comment: Missing reviewer attribution")
         if (i < len(lns)):
             self.error(ctx, "Extraneous text")
+
+    def c_02_file_contents(self, ctx):
+        changes = self.repo.status(ctx.parents()[0].node(),
+                                   ctx.node(), None)[:5]
+        modified, added = changes[:2]
+        # ## Skip files that were renamed but not modified
+        files = modified + added
+        self.ui.note("Checking files: %s\n" % ", ".join(files))
+        for f in files:
+            fx = ctx.filectx(f)
+            data = fx.data()
+            if badwhite_re.search(data):
+                self.error(ctx, "%s: Bad whitespace in file" % f)
+            ## check_file_header(self, fx, data)
 
     def check(self, node):
         self.summarized = False

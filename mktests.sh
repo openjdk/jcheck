@@ -21,12 +21,30 @@ datefile=date
 test() {
   date >>$datefile; hg add --exclude 'z*'
   export HGUSER=$1; shift
-  (set -x; hg "$@")
+  if [ -z "$*" ]; then
+    msg="$(bugid): Bug
+Reviewed-by: duke"
+    (set -x; hg ci -m "$msg")
+  else
+    (set -x; hg "$@")
+  fi
 }
 
 pass() { test pass "$@"; }
 fail() { test fail "$@"; }
 setup() { test setup "$@"; }
+
+
+# File content
+
+echo 'foo ' >trailing-space
+fail
+
+echo 'foo' >carriage-return
+fail
+
+echo 'foo	bar' >tab
+fail
 
 
 # Merge-changeset comments
