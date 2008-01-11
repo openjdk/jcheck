@@ -213,7 +213,7 @@ class checker(object):
         if (i < len(lns)):
             self.error(ctx, "Extraneous text")
 
-    def c_02_file_contents(self, ctx):
+    def c_02_files(self, ctx):
         changes = self.repo.status(ctx.parents()[0].node(),
                                    ctx.node(), None)[:5]
         modified, added = changes[:2]
@@ -228,6 +228,11 @@ class checker(object):
                 ln = data.count("\n", 0, m.start()) + 1
                 self.error(ctx, "%s:%d: %s" % (f, ln, badwhite_what(m)))
             ## check_file_header(self, fx, data)
+            fm = fx.manifest()
+            if fm.execf(f):
+                self.error(ctx, "%s: Executable files not permitted" % f)
+            if fm.linkf(f):
+                self.error(ctx, "%s: Symbolic links not permitted" % f)
 
     def check(self, node):
         self.summarized = False

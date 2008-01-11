@@ -75,6 +75,16 @@ foo	bar' >tab
 fail
 
 
+# File modes and types
+
+touch executable
+chmod +x executable
+fail
+
+ln -s foo symlink
+fail
+
+
 # Changeset comments
 
 fail ci -m "Blah blah"
