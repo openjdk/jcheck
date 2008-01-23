@@ -1,5 +1,7 @@
 #! /bin/bash
 
+export HGRCPATH=
+
 cd $(dirname $0)/tests
 
 last=$(hg tip --template '{rev}')
@@ -32,6 +34,8 @@ done
 echo "-- $r pretxnchangegroup"
 rm -rf z
 hg init z
+touch z/.jcheck
+cp .hg/hgrc z/.hg
 if hg push z; then fail; fi
 r=$(expr $r + 1)
 

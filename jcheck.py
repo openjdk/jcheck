@@ -23,7 +23,7 @@
 
 # JDK changeset checker
 
-import re
+import re, os
 from mercurial.node import *
 from mercurial import cmdutil, patch, util, context, templater
 
@@ -249,6 +249,9 @@ def hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     ui.debug("jcheck: node %s, source %s, args %s\n" % (node, source, kwargs))
     if not repo.local():
         raise util.Abort("repository '%s' is not local" % repo.path)
+    if not os.path.exists(os.path.join(repo.root, ".jcheck")):
+        ui.note("jcheck not enabled (no .jcheck in repository root); skipping\n")
+        return Pass
     ch = checker(ui, repo, repo_bugids(ui, repo))
     firstnode = bin(node)
     start = repo.changelog.rev(firstnode)
@@ -265,6 +268,9 @@ def jcheck(ui, repo, **opts):
     ui.debug("jcheck repo=%s opts=%s\n" % (repo.path, opts))
     if not repo.local():
         raise util.Abort("repository '%s' is not local" % repo.path)
+    if not os.path.exists(os.path.join(repo.root, ".jcheck")):
+        ui.status("jcheck not enabled (no .jcheck in repository root)\n")
+        return Pass
     if len(opts["rev"]) == 0:
         opts["rev"] = ["tip"]
 

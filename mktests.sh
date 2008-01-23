@@ -14,6 +14,8 @@ jcheck = $(pwd)/../jcheck.py
 pretxnchangegroup = python:jcheck.hook
 ___
 
+touch .jcheck
+
 date >date
 HGUSER=setup hg ci -Am '1000000: Init
 Reviewed-by: duke'
