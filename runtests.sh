@@ -29,6 +29,12 @@ while [ $r -le $last ]; do
   r=$(expr $r + 1)
 done
 
+echo "-- $r pretxnchangegroup"
+rm -rf z
+hg init z
+if hg push z; then fail; fi
+r=$(expr $r + 1)
+
 if [ $failures -gt 0 ]; then
   echo "-- FAILURES: $failures"
 else

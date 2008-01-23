@@ -1,8 +1,18 @@
 #! /bin/bash
 
+export HGRCPATH=
+
 rm -rf tests
 hg init tests
 cd tests
+
+cat >.hg/hgrc <<___
+[extensions]
+fetch =
+jcheck = $(pwd)/../jcheck.py
+[hooks]
+pretxnchangegroup = python:jcheck.hook
+___
 
 date >date
 HGUSER=setup hg ci -Am '1000000: Init

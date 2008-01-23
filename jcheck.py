@@ -244,11 +244,20 @@ class checker(object):
             cf(self, ctx)
         return self.rv
 
-## broken right now
+
 def hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     ui.debug("jcheck: node %s, source %s, args %s\n" % (node, source, kwargs))
-    ch = checker(ui, repo)
-    return ch.check(node)
+    if not repo.local():
+        raise util.Abort("repository '%s' is not local" % repo.path)
+    ch = checker(ui, repo, repo_bugids(ui, repo))
+    firstnode = bin(node)
+    start = repo.changelog.rev(firstnode)
+    end = repo.changelog.count()
+    for rev in xrange(start, end):
+        ch.check(repo.changelog.node(rev))
+    if ch.rv == Fail:
+        ui.status("\n")
+    return ch.rv
 
 
 def jcheck(ui, repo, **opts):
@@ -276,6 +285,8 @@ def jcheck(ui, repo, **opts):
         elif st == 'iter':
             if ui.debugflag:
                 displayer.flush(rev)
+    if ch.rv == Fail:
+        ui.status("\n")
     return ch.rv
 
 opts = [("r", "rev", [], "check the specified revision or range (default: tip)")]
