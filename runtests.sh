@@ -14,6 +14,9 @@ fail() {
   if [ $FAILFIRST ]; then exit 2; fi
 }
 
+
+# Cases created by mktests
+
 r=0
 while [ $r -le $last ]; do
   type=$(hg log -r $r --template '{author}')
@@ -31,6 +34,19 @@ while [ $r -le $last ]; do
   r=$(expr $r + 1)
 done
 
+
+# Cases that require richer logic
+
+echo 9000000 >.hg/bugid
+
+bugid() {
+  b=$(expr $(cat .hg/bugid) + 1)
+  echo $b >.hg/bugid
+  echo $b
+}
+
+# pretxnchangegroup hook
+
 echo "-- $r pretxnchangegroup"
 rm -rf z
 hg init z
@@ -38,6 +54,62 @@ touch z/.jcheck
 cp .hg/hgrc z/.hg
 if hg push z; then fail; fi
 r=$(expr $r + 1)
+
+# Multiple heads
+
+echo "-- $r multiple heads"
+n=$(hg id -n)
+date >>date.$n
+hg add date.$n
+HGUSER=setup hg ci -m "$(bugid): Head one
+Reviewed-by: duke"
+rm -rf z
+hg bundle --base $n -r $(expr $n + 1) z
+hg rollback
+hg revert date.$n
+date >>date.$n.2
+hg add date.$n.2
+HGUSER=setup hg ci -m "$(bugid): Head two
+Reviewed-by: duke"
+HG='hg --config hooks.pretxnchangegroup=python:jcheck.strict_hook'
+if HGUSER=setup $HG pull z; then fail $r; fi
+hg revert date.$n.2
+rm -rf z
+r=$(expr $r + 1)
+
+# Named branches
+
+echo "-- $r named branches"
+hg branch foo
+date >date.$r
+hg add date.$r
+HG='hg --config hooks.pretxncommit=python:jcheck.hook'
+if HGUSER=setup $HG ci -m "$(bugid): Branch
+Reviewed-by: duke" ; then fail $r; fi
+hg rollback; hg revert -a
+rm .hg/branch ## hg bug ?
+r=$(expr $r + 1)
+
+# Tags
+
+HG='hg --config hooks.pretxncommit=python:jcheck.hook'
+for t in foo jdk7 jdk7-b1; do
+  echo "-- $r tag $t"
+  if HGUSER=setup $HG tag -r 1 $t; then hg rollback; fail $r; fi
+  hg revert -a; rm .hgtags
+  r=$(expr $r + 1)
+done
+
+HG='hg --config hooks.pretxncommit=python:jcheck.hook'
+for t in jdk7-b01 jdk7-b123; do
+  echo "-- $r tag $t"
+  if ! HGUSER=setup $HG tag -r 1 $t; then fail $r; fi
+  hg rollback; hg revert -a; rm .hgtags
+  r=$(expr $r + 1)
+done
+
+
+# Summary
 
 if [ $failures -gt 0 ]; then
   echo "-- FAILURES: $failures"

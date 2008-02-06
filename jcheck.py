@@ -49,6 +49,9 @@ def validate_author(an):
 
 badwhite_re = re.compile("(\t)|([ \t]$)|\r", re.MULTILINE)
 
+tag_desc_re = re.compile("Added tag [^ ]+ for changeset [0-9a-f]{12}")
+tag_re = re.compile("tip|jdk[67]-b\d{2,3}")
+
 def badwhite_what(m):
     if m.group(1):
         return "Tab character"
@@ -135,7 +138,7 @@ def repo_bugids(ui, repo):
 
 class checker(object):
 
-    def __init__(self, ui, repo, repo_bugids):
+    def __init__(self, ui, repo, repo_bugids, strict):
         self.ui = ui
         self.repo = repo
         self.rv = Pass
@@ -144,6 +147,7 @@ class checker(object):
         self.summarized = False
         self.repo_bugids = repo_bugids
         self.bugids = [ ]               # Bugids in current changeset
+        self.strict = strict
 
     def summarize(self, ctx):
         self.ui.status("\n")
@@ -153,11 +157,14 @@ class checker(object):
         self.ui.status(">\n> ")
         self.ui.status("\n> ".join(ctx.description().splitlines()))
         self.ui.status("\n\n")
-        self.summarized = True
 
     def error(self, ctx, msg):
         if not self.summarized:
-            self.summarize(ctx)
+            if ctx:
+                self.summarize(ctx)
+            else:
+                self.ui.status("\n")
+            self.summarized = True
         self.ui.status(msg + "\n")
         self.rv = Fail
 
@@ -176,6 +183,10 @@ class checker(object):
             if ctx.description() != "Merge":
                 self.error(ctx, ("Invalid comment for merge changeset"
                                  + " (must be \"Merge\")"))
+            return
+
+        if tag_desc_re.match(ctx.description()):
+            ## Should check tag itself
             return
 
         lns = ctx.description().splitlines()
@@ -244,15 +255,42 @@ class checker(object):
             cf(self, ctx)
         return self.rv
 
+    def check_repo(self):
 
-def hook(ui, repo, hooktype, node=None, source=None, **kwargs):
-    ui.debug("jcheck: node %s, source %s, args %s\n" % (node, source, kwargs))
+        ts = self.repo.tags().keys()
+        for t in ts:
+            if not tag_re.match(t):
+                self.error(None,
+                           "Illegal tag name: %s" % t)
+
+        bs = self.repo.branchtags()
+        if len(bs) > 1:
+            bs = bs.copy()
+            del bs["default"]
+            self.error(None,
+                       "Named branches not permitted; this repository has: %s"
+                       % ", ".join(bs.keys()))
+
+        if self.strict:
+            nh = len(self.repo.heads())
+            if nh > 1:
+                self.error(None,
+                           "Multiple heads not permitted; this repository has %d"
+                           % nh)
+
+        return self.rv
+
+
+def hook(ui, repo, hooktype, node=None, source=None, **opts):
+    ui.debug("jcheck: node %s, source %s, args %s\n" % (node, source, opts))
     if not repo.local():
         raise util.Abort("repository '%s' is not local" % repo.path)
     if not os.path.exists(os.path.join(repo.root, ".jcheck")):
         ui.note("jcheck not enabled (no .jcheck in repository root); skipping\n")
         return Pass
-    ch = checker(ui, repo, repo_bugids(ui, repo))
+    strict = opts.has_key("strict") and opts["strict"]
+    ch = checker(ui, repo, repo_bugids(ui, repo), strict)
+    ch.check_repo()
     firstnode = bin(node)
     start = repo.changelog.rev(firstnode)
     end = repo.changelog.count()
@@ -261,6 +299,13 @@ def hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     if ch.rv == Fail:
         ui.status("\n")
     return ch.rv
+
+
+# Run this hook in repository gates
+
+def strict_hook(ui, repo, hooktype, node=None, source=None, **opts):
+    opts["strict"] = True
+    return hook(ui, repo, hooktype, node, source, **opts)
 
 
 def jcheck(ui, repo, **opts):
@@ -274,12 +319,13 @@ def jcheck(ui, repo, **opts):
     if len(opts["rev"]) == 0:
         opts["rev"] = ["tip"]
 
+    ch = checker(ui, repo, repo_bugids(ui, repo), False)
+    ch.check_repo()
+
     get = util.cachefunc(lambda r: repo.changectx(r).changeset())
     changeiter, matchfn = cmdutil.walkchangerevs(ui, repo, [], get, opts)
-
     if ui.debug:
         displayer = cmdutil.show_changeset(ui, repo, opts, True, matchfn)
-    ch = checker(ui, repo, repo_bugids(ui, repo))
     for st, rev, fns in changeiter:
         if st == 'add':
             node = repo.changelog.node(rev)
@@ -295,10 +341,11 @@ def jcheck(ui, repo, **opts):
         ui.status("\n")
     return ch.rv
 
-opts = [("r", "rev", [], "check the specified revision or range (default: tip)")]
+opts = [("r", "rev", [], "check the specified revision or range (default: tip)"),
+        ("s", "strict", False, "check everything")]
 
-help = "[-r rev]"
+help = "[-r rev] [-s]"
 
 cmdtable = {
-    "jcheck": (jcheck, opts, "hg jcheck [-r rev]")
+    "jcheck": (jcheck, opts, "hg jcheck [-r rev] [-s]")
 }
