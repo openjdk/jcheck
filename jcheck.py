@@ -54,6 +54,9 @@
 #   [defaults]
 #   fetch = -m Merge
 
+_version = "@VERSION@"
+_date = "@DATE@"
+
 import re, os
 from mercurial.node import *
 from mercurial import cmdutil, patch, util, context, templater
