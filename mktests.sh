@@ -2,6 +2,11 @@
 
 export HGRCPATH=
 
+# No insult intended here -- we just need valid author names for the tests
+pass_author=ohair
+fail_author=mr
+setup_author=xdono
+
 rm -rf tests
 hg init tests
 cd tests
@@ -14,10 +19,11 @@ jcheck = $(pwd)/../jcheck.py
 pretxnchangegroup = python:jcheck.hook
 ___
 
-touch .jcheck
+mkdir .jcheck
+echo 'project=jdk7' >.jcheck/conf
 
 date >date
-HGUSER=setup hg ci -Am '1000000: Init
+HGUSER=$setup_author hg ci -Am '1000000: Init
 Reviewed-by: duke'
 
 echo 1000001 >.hg/bugid
@@ -42,9 +48,9 @@ Reviewed-by: duke"
   fi
 }
 
-pass() { test pass "$@"; }
-fail() { test fail "$@"; }
-setup() { test setup "$@"; }
+pass() { test $pass_author "$@"; }
+fail() { test $fail_author "$@"; }
+setup() { test $setup_author "$@"; }
 
 
 # Merge-changeset comments
@@ -56,7 +62,7 @@ hg bundle --base 0 -r 1 z
 hg rollback
 (datefile=date2 setup ci -m "$(bugid): Merge to bug
 Reviewed-by: duke")
-(export HGUSER=fail; set -x; hg fetch z)
+(export HGUSER=$fail_author; set -x; hg fetch z)
 rm z
 
 setup ci -m "$(bugid): Bug to merge
@@ -65,7 +71,7 @@ hg bundle --base 3 -r 4 z
 hg rollback
 (datefile=date3 setup ci -m "$(bugid): Merge to bug
 Reviewed-by: duke")
-(export HGUSER=pass; set -x; hg fetch -m Merge z)
+(export HGUSER=$pass_author; set -x; hg fetch -m Merge z)
 rm z
 
 
@@ -144,10 +150,10 @@ fail ci -m "nobugid: No bugid
 Reviewed-by: duke"
 
 pass ci -m "$(bugid): The next bug
-Reviewed-by: mr, kgh"
+Reviewed-by: mr, wetmore"
 
 fail ci -m "$(bugid): The next bug
-Reviewed-by: mr kgh"
+Reviewed-by: mr wetmore"
 
 fail ci -m "$(bugid): Another bug
 Contributed-by: Ben Bitdiddle <ben@bits.org>"
@@ -211,4 +217,4 @@ fail ci -m "$(bugid): Buggy bug bug bug
 Reviewed-by: fang"
 
 test fang ci -m "$(bugid): Buggy bug bug bug
-Reviewed-by: beelzebub"
+Reviewed-by: jcoomes"

@@ -54,10 +54,12 @@
 #   [defaults]
 #   fetch = -m Merge
 
+from __future__ import with_statement
+
 _version = "@VERSION@"
 _date = "@DATE@"
 
-import re, os
+import sys, os, re, urllib2
 from mercurial.node import *
 from mercurial import cmdutil, patch, util, context, templater
 
@@ -74,9 +76,51 @@ def oneline(ctx):
 def is_merge(repo, rev):
     return not (-1 in repo.changelog.parentrevs(rev))
 
-# ## Stub: This will eventually query the db
-def validate_author(an):
-    return an != "fang"
+
+# Configuration-file parsing
+
+def load_conf(root):
+    cf = { }
+    fn = os.path.join(root, ".jcheck/conf")
+    with open(fn) as f:
+        prop_re = re.compile("\s*(\S+)\s*=\s*(\S+)\s*$")
+        i = 0
+        for ln in f.readlines():
+            i = i + 1
+            ln = ln.strip()
+            if (ln.startswith("#")):
+                continue
+            m = prop_re.match(ln)
+            if not m:
+                raise util.Abort("%s:%d: Invalid configuration syntax: %s"
+                                 % (fn, i, ln))
+            cf[m.group(1)] = m.group(2)
+    for pn in ["project"]:
+        if not cf.has_key(pn):
+            raise util.Abort("%s: Missing property: %s" % (fn, pn))
+    return cf
+
+
+# Author validation
+
+author_cache = { }                      ## Should really cache more permanently
+
+def validate_author(an, pn):
+  if author_cache.has_key(an):
+    return True
+  u = "https://db.openjdk.java.net/people/%s/projects/%s" % (an, pn)
+  f = None
+  try:
+    f = urllib2.urlopen(u)
+  except urllib2.HTTPError, e:
+    if e.code == 404:
+      return False
+    raise e
+  finally:
+    if f:
+      f.close()
+  author_cache[an] = True
+  return True
 
 
 # Comment validation
@@ -106,7 +150,7 @@ rev_check = re.compile("Reviewed-by: (([a-z0-9]+)(, [a-z0-9]+)*$)")
 con_ident = re.compile("Contributed-by:")
 con_check = re.compile("Contributed-by: (" + addr_pat + ")$")
 
-def bug_validate(ch, ctx, m):
+def bug_validate(ch, ctx, m, pn):
     b = int(m.group(1))
     if b < 1000000:
         return "Bugid out of range"
@@ -119,10 +163,10 @@ def bug_validate(ch, ctx, m):
             ch.error(ctx, ("Bugid %d already used in this repository, in revision %d "
                            % (b, r)))
 
-def rev_validate(ch, ctx, m):
+def rev_validate(ch, ctx, m, pn):
     ans = re.split(", *", m.group(1))
     for an in ans:
-        if not validate_author(an):
+        if not validate_author(an, pn):
             ch.error(ctx, "Invalid reviewer name: %s" % an)
 
 class State:
@@ -182,6 +226,7 @@ class checker(object):
         self.repo_bugids = repo_bugids
         self.bugids = [ ]               # Bugids in current changeset
         self.strict = strict
+        self.conf = load_conf(repo.root)
 
     def summarize(self, ctx):
         self.ui.status("\n")
@@ -204,8 +249,8 @@ class checker(object):
 
     def c_00_author(self, ctx):
         self.ui.debug("author: %s\n" % ctx.user())
-        if not validate_author(ctx.user()):
-            self.error(ctx, "Invalid changeset author")
+        if not validate_author(ctx.user(), self.conf["project"]):
+            self.error(ctx, "Invalid changeset author: %s" % ctx.user())
 
     def c_01_comment(self, ctx):
         m = badwhite_re.search(ctx.description())
@@ -237,7 +282,7 @@ class checker(object):
                 if not m:
                     self.error(ctx, "Invalid %s" % st.name)
                 elif st.validator:
-                    st.validator(self, ctx, m)
+                    st.validator(self, ctx, m, self.conf["project"])
                 n = n + 1
                 i = i + 1
                 if i >= len(lns):
