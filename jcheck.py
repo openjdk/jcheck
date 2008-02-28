@@ -140,12 +140,12 @@ def badwhite_what(m):
 
 base_addr_pat = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
 addr_pat = ("(" + base_addr_pat + ")"
-            + "|(([-_ a-zA-Z0-9]+) +<" + base_addr_pat + ">)")
+            + "|(([-_a-zA-Z0-9][-_ a-zA-Z0-9]+) +<" + base_addr_pat + ">)")
 
 bug_ident = re.compile("([0-9]+):")
-bug_check = re.compile("([0-9]{7}): [^\[\]]*$")
+bug_check = re.compile("([0-9]{7}): \S[^\[\]]*$")
 sum_ident = re.compile("Summary:")
-sum_check = re.compile("Summary: .*")
+sum_check = re.compile("Summary: \S.*")
 rev_ident = re.compile("Reviewed-by:")
 rev_check = re.compile("Reviewed-by: (([a-z0-9]+)(, [a-z0-9]+)*$)")
 con_ident = re.compile("Contributed-by:")

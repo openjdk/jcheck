@@ -112,11 +112,20 @@ fail ci -m "Blah blah"
 pass ci -m "$(bugid): A random bug
 Reviewed-by: duke"
 
+fail ci -m "$(bugid): A random bug
+ Reviewed-by: duke"
+
 fail ci -m " $(bugid): A random bug
+Reviewed-by: duke"
+
+fail ci -m "$(bugid):  A random bug
 Reviewed-by: duke"
 
 fail ci -m "$(bugid):
 Reviewed-by: duke"
+
+fail ci -m "$(bugid): A random bug
+Reviewed-by:  duke"
 
 fail ci -m "Reviewed-by: duke"
 
@@ -170,6 +179,10 @@ Contributed-by: Ben Bitdiddle <ben@bits.org>"
 
 fail ci -m "$(bugid): Another bug
 Reviewed-by: duke
+Contributed-by:  Ben Bitdiddle <ben@bits.org>"
+
+fail ci -m "$(bugid): Another bug
+Reviewed-by: duke
 Contributed-by: Ben Bitdiddle"
 
 fail ci -m "$(bugid): Another bug
@@ -186,6 +199,14 @@ Reviewed-by: duke"
 
 fail ci -m "$(bugid): Yet another bug
 Summary: 
+Reviewed-by: duke"
+
+fail ci -m "$(bugid): Yet another bug
+Summary:  Rewrite code
+Reviewed-by: duke"
+
+fail ci -m "$(bugid): Yet another bug
+ Summary: Rewrite code
 Reviewed-by: duke"
 
 fail ci -m "$(bugid): Yet another bug
