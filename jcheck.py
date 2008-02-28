@@ -123,9 +123,10 @@ def validate_author(an, pn):
   return True
 
 
-# Comment validation
+# Whitespace and comment validation
 
 badwhite_re = re.compile("(\t)|([ \t]$)|\r", re.MULTILINE)
+normext_re = re.compile(".*\.(java|c|h|cpp|hpp)$")
 
 tag_desc_re = re.compile("Added tag [^ ]+ for changeset [0-9a-f]{12}")
 tag_re = re.compile("tip|jdk[67]-b\d{2,3}")
@@ -301,7 +302,7 @@ class checker(object):
         elif gi == 1 or (gi == 2 and n == 0):
             self.error(ctx, "Incomplete comment: Missing reviewer attribution")
         if (i < len(lns)):
-            self.error(ctx, "Extraneous text")
+            self.error(ctx, "Extraneous text in comment")
 
     def c_02_files(self, ctx):
         changes = self.repo.status(ctx.parents()[0].node(),
@@ -312,11 +313,12 @@ class checker(object):
         self.ui.note("Checking files: %s\n" % ", ".join(files))
         for f in files:
             fx = ctx.filectx(f)
-            data = fx.data()
-            m = badwhite_re.search(data)
-            if m:
-                ln = data.count("\n", 0, m.start()) + 1
-                self.error(ctx, "%s:%d: %s" % (f, ln, badwhite_what(m)))
+            if normext_re.match(f):
+                data = fx.data()
+                m = badwhite_re.search(data)
+                if m:
+                    ln = data.count("\n", 0, m.start()) + 1
+                    self.error(ctx, "%s:%d: %s" % (f, ln, badwhite_what(m)))
             ## check_file_header(self, fx, data)
             fm = fx.manifest()
             if fm.execf(f):

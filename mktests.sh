@@ -79,19 +79,21 @@ rm z
 
 echo 'alpha
 beta
-foo ' >trailing-space
+foo ' >trailing-space.java
 fail
 
 echo 'alpha
 beta
-foo' >carriage-return
+foo' >carriage-return.c
 fail
 
 echo 'alpha
 beta
-foo	bar' >tab
+foo	bar' >tab.h
 fail
 
+echo '	foo' >Makefile
+pass
 
 # File modes and types
 
