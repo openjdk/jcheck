@@ -105,7 +105,7 @@ r=$(expr $r + 1)
 # Tags
 
 HG='hg --config hooks.pretxncommit=python:jcheck.hook'
-for t in foo jdk7 jdk7-b1; do
+for t in foo jdk7 jdk7-b1 hs11-b02; do
   echo "-- $r tag $t"
   if HGUSER=$setup_author $HG tag -r 1 $t; then hg rollback; fail $r; fi
   hg revert -a; rm .hgtags
@@ -113,7 +113,7 @@ for t in foo jdk7 jdk7-b1; do
 done
 
 HG='hg --config hooks.pretxncommit=python:jcheck.hook'
-for t in jdk7-b01 jdk7-b123; do
+for t in jdk7-b01 jdk7-b123 hs11.1-b02; do
   echo "-- $r tag $t"
   if ! HGUSER=$setup_author $HG tag -r 1 $t; then fail $r; fi
   hg rollback; hg revert -a; rm .hgtags
