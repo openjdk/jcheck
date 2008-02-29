@@ -108,7 +108,7 @@ author_cache = { }                      ## Should really cache more permanently
 def validate_author(an, pn):
   if author_cache.has_key(an):
     return True
-  u = "https://db.openjdk.java.net/people/%s/projects/%s" % (an, pn)
+  u = "http://db.openjdk.java.net/people/%s/projects/%s" % (an, pn)
   f = None
   try:
     f = urllib2.urlopen(u)
