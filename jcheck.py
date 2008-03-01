@@ -269,6 +269,9 @@ class checker(object):
             ## Should check tag itself
             return
 
+        if ctx.rev() == 0 and ctx.description() == "Initial load":
+            return
+
         lns = ctx.description().splitlines()
 
         i = 0                           # Input index
@@ -312,6 +315,11 @@ class checker(object):
         files = modified + added
         self.ui.note("Checking files: %s\n" % ", ".join(files))
         for f in files:
+            if ctx.rev() == 0:
+                ## This is loathsome
+                if f.startswith("test/java/rmi"): continue
+                if f.startswith("test/com/sun/javadoc/test"): continue
+                if f.startswith("docs/technotes/guides"): continue
             fx = ctx.filectx(f)
             if normext_re.match(f):
                 data = fx.data()
