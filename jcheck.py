@@ -54,8 +54,6 @@
 #   [defaults]
 #   fetch = -m Merge
 
-from __future__ import with_statement
-
 _version = "@VERSION@"
 _date = "@DATE@"
 
@@ -82,7 +80,8 @@ def is_merge(repo, rev):
 def load_conf(root):
     cf = { }
     fn = os.path.join(root, ".jcheck/conf")
-    with open(fn) as f:
+    f = open(fn)
+    try:
         prop_re = re.compile("\s*(\S+)\s*=\s*(\S+)\s*$")
         i = 0
         for ln in f.readlines():
@@ -95,6 +94,8 @@ def load_conf(root):
                 raise util.Abort("%s:%d: Invalid configuration syntax: %s"
                                  % (fn, i, ln))
             cf[m.group(1)] = m.group(2)
+    finally:
+        f.close()
     for pn in ["project"]:
         if not cf.has_key(pn):
             raise util.Abort("%s: Missing property: %s" % (fn, pn))
@@ -111,14 +112,15 @@ def validate_author(an, pn):
   u = "http://db.openjdk.java.net/people/%s/projects/%s" % (an, pn)
   f = None
   try:
-    f = urllib2.urlopen(u)
-  except urllib2.HTTPError, e:
-    if e.code == 404:
-      return False
-    raise e
+      try:
+          f = urllib2.urlopen(u)
+      except urllib2.HTTPError, e:
+          if e.code == 404:
+              return False
+          raise e
   finally:
-    if f:
-      f.close()
+      if f:
+          f.close()
   author_cache[an] = True
   return True
 
