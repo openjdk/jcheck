@@ -83,7 +83,7 @@ date >>date.$n.2
 hg add date.$n.2
 HGUSER=$setup_author hg ci -m "$(bugid): Head two
 Reviewed-by: duke"
-HG='hg --config hooks.pretxnchangegroup=python:jcheck.strict_hook'
+HG='hg --config hooks.pretxnchangegroup.jcheck=python:jcheck.strict_hook'
 if HGUSER=$setup_author $HG pull z; then fail $r; fi
 hg revert date.$n.2
 rm -rf z
@@ -95,7 +95,7 @@ echo "-- $r named branches"
 hg branch foo
 date >date.$r
 hg add date.$r
-HG='hg --config hooks.pretxncommit=python:jcheck.hook'
+HG='hg --config hooks.pretxncommit.jcheck=python:jcheck.hook'
 if HGUSER=$setup_author $HG ci -m "$(bugid): Branch
 Reviewed-by: duke" ; then fail $r; fi
 hg rollback; hg revert -a
@@ -104,7 +104,7 @@ r=$(expr $r + 1)
 
 # Tags
 
-HG='hg --config hooks.pretxncommit=python:jcheck.hook'
+HG='hg --config hooks.pretxncommit.jcheck=python:jcheck.hook'
 for t in foo jdk7 jdk7-b1 hs11-b02; do
   echo "-- $r tag $t"
   if HGUSER=$setup_author $HG tag -r 1 $t; then hg rollback; fail $r; fi
@@ -112,7 +112,7 @@ for t in foo jdk7 jdk7-b1 hs11-b02; do
   r=$(expr $r + 1)
 done
 
-HG='hg --config hooks.pretxncommit=python:jcheck.hook'
+HG='hg --config hooks.pretxncommit.jcheck=python:jcheck.hook'
 for t in jdk7-b01 jdk7-b123 hs11.1-b02; do
   echo "-- $r tag $t"
   if ! HGUSER=$setup_author $HG tag -r 1 $t; then fail $r; fi

@@ -38,8 +38,8 @@
 # you never create invalid changesets in a working JDK repository:
 #
 #   [hooks]
-#   pretxnchangegroup = python:jcheck.hook
-#   pretxncommit = python:jcheck.hook
+#   pretxnchangegroup.jcheck = python:jcheck.hook
+#   pretxncommit.jcheck = python:jcheck.hook
 #
 # This extension only enforces its checks if the root of the repository upon
 # which it is invoked contains a directory named ".jcheck", so these hooks will
