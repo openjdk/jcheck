@@ -57,7 +57,7 @@
 _version = "@VERSION@"
 _date = "@DATE@"
 
-import sys, os, re, urllib2
+import sys, os, re, urllib, urllib2
 from mercurial.node import *
 from mercurial import cmdutil, patch, util, context, templater
 
@@ -109,7 +109,8 @@ author_cache = { }                      ## Should really cache more permanently
 def validate_author(an, pn):
   if author_cache.has_key(an):
     return True
-  u = "http://db.openjdk.java.net/people/%s/projects/%s" % (an, pn)
+  u = ("http://db.openjdk.java.net/people/%s/projects/%s"
+       % (urllib.quote(an), pn))
   f = None
   try:
       try:
