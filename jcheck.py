@@ -146,7 +146,7 @@ addr_pat = ("(" + base_addr_pat + ")"
             + "|(([-_a-zA-Z0-9][-_ a-zA-Z0-9]+) +<" + base_addr_pat + ">)")
 
 bug_ident = re.compile("([0-9]+):")
-bug_check = re.compile("([0-9]{7}): \S[^\[\]]*$")
+bug_check = re.compile("([0-9]{7}): \S.*$")
 sum_ident = re.compile("Summary:")
 sum_check = re.compile("Summary: \S.*")
 rev_ident = re.compile("Reviewed-by:")

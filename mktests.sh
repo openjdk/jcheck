@@ -151,9 +151,6 @@ pass ci -m "$(bugid): A random bug
 $(bugid): Another random bug
 Reviewed-by: duke"
 
-fail ci -m "$(bugid): A random bug [foo.bar]
-Reviewed-by: duke"
-
 fail ci -m "123456: A short bugid
 Reviewed-by: duke"
 
