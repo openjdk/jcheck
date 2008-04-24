@@ -174,6 +174,22 @@ pass ci -m "$(bugid): Another bug
 Reviewed-by: duke
 Contributed-by: Ben Bitdiddle <ben@bits.org>"
 
+pass ci -m "$(bugid): Another bug
+Reviewed-by: duke
+Contributed-by: Ben Bitdiddle <ben@bits.org>, Alyssa P Hacker <alyssa@hacker.net>"
+
+pass ci -m "$(bugid): Another bug
+Reviewed-by: duke
+Contributed-by: ben@bits.org, Alyssa P Hacker <alyssa@hacker.net>"
+
+pass ci -m "$(bugid): Another bug
+Reviewed-by: duke
+Contributed-by: ben@bits.org, alyssa@hacker.net"
+
+fail ci -m "$(bugid): Another bug
+Reviewed-by: duke
+Contributed-by: ben@bits.org alyssa@hacker.net"
+
 fail ci -m "$(bugid): Another bug
 Reviewed-by: duke
 Contributed-by:  Ben Bitdiddle <ben@bits.org>"

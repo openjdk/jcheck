@@ -152,7 +152,7 @@ sum_check = re.compile("Summary: \S.*")
 rev_ident = re.compile("Reviewed-by:")
 rev_check = re.compile("Reviewed-by: (([a-z0-9]+)(, [a-z0-9]+)*$)")
 con_ident = re.compile("Contributed-by:")
-con_check = re.compile("Contributed-by: (" + addr_pat + ")$")
+con_check = re.compile("Contributed-by: ((" + addr_pat + ")(, (" + addr_pat + "))*)$")
 
 def bug_validate(ch, ctx, m, pn):
     b = int(m.group(1))
