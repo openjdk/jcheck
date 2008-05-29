@@ -260,3 +260,13 @@ Reviewed-by: fang"
 
 test fang ci -m "$(bugid): Buggy bug bug bug
 Reviewed-by: jcoomes"
+
+fail ci -m "$(bugid): Solo self-review
+Reviewed-by: $fail_author"
+
+pass ci -m "$(bugid): Paired self-review
+Reviewed-by: $pass_author, $setup_author"
+
+pass ci -m "$(bugid): Self-review of a contribution
+Reviewed-by: $pass_author
+Contributed-by: ben@bits.org"

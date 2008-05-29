@@ -159,9 +159,9 @@ def bug_validate(ch, ctx, m, pn):
     if not (bs[0] in ['1','2','4','6']):
         ch.error(ctx, "Invalid bugid: %s" % bs)
     b = int(bs)
-    if b in ch.bugids:
+    if b in ch.cs_bugids:
         ch.error(ctx, "Bugid %d used more than once in this changeset" % b)
-    ch.bugids.append(b)
+    ch.cs_bugids.append(b)
     if b in ch.repo_bugids:
         r = ch.repo_bugids[b]
         if r < ctx.rev():
@@ -173,6 +173,10 @@ def rev_validate(ch, ctx, m, pn):
     for an in ans:
         if not validate_author(an, pn):
             ch.error(ctx, "Invalid reviewer name: %s" % an)
+        ch.cs_reviewers.append(an)
+
+def con_validate(ch, ctx, m, pn):
+    ch.cs_contributor = m.group(1)
 
 class State:
     def __init__(self, name, ident_pattern, check_pattern,
@@ -192,7 +196,7 @@ comment_grammar = [
     State("reviewer attribution",
           rev_ident, rev_check, validator=rev_validate, min=1, max=1),
     State("contributor attribution",
-          con_ident, con_check, min=0, max=1)
+          con_ident, con_check, validator=con_validate, min=0, max=1)
 ]
 
 def repo_bugids(ui, repo):
@@ -229,7 +233,10 @@ class checker(object):
         self.checks.sort()
         self.summarized = False
         self.repo_bugids = repo_bugids
-        self.bugids = [ ]               # Bugids in current changeset
+        self.cs_bugids = [ ]            # Bugids in current changeset
+        self.cs_author = None           # Author of current changeset
+        self.cs_reviewers = [ ]         # Reviewers of current changeset
+        self.cs_contributor = None      # Contributor of current changeset
         self.strict = strict
         self.conf = load_conf(repo.root)
 
@@ -256,6 +263,7 @@ class checker(object):
         self.ui.debug("author: %s\n" % ctx.user())
         if not validate_author(ctx.user(), self.conf["project"]):
             self.error(ctx, "Invalid changeset author: %s" % ctx.user())
+        self.cs_author = ctx.user()
 
     def c_01_comment(self, ctx):
         m = badwhite_re.search(ctx.description())
@@ -304,6 +312,8 @@ class checker(object):
             if gi >= len(comment_grammar):
                 break
 
+        if not self.cs_contributor and [self.cs_author] == self.cs_reviewers:
+            self.error(ctx, "Self-reviews not permitted")
         if (gi == 0 and n > 0):
             self.error(ctx, "Incomplete comment: Missing bugid line")
         elif gi == 1 or (gi == 2 and n == 0):
@@ -340,7 +350,10 @@ class checker(object):
 
     def check(self, node):
         self.summarized = False
-        self.bugids = [ ]
+        self.cs_bugids = [ ]
+        self.cs_author = None
+        self.cs_reviewers = [ ]
+        self.cs_contributor = None
         ctx = context.changectx(self.repo, node)
         self.ui.debug(oneline(ctx))
         for c in self.checks:
