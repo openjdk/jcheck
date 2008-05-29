@@ -155,9 +155,10 @@ con_ident = re.compile("Contributed-by:")
 con_check = re.compile("Contributed-by: ((" + addr_pat + ")(, (" + addr_pat + "))*)$")
 
 def bug_validate(ch, ctx, m, pn):
-    b = int(m.group(1))
-    if b < 1000000:
-        return "Bugid out of range"
+    bs = m.group(1)
+    if not (bs[0] in ['1','2','4','6']):
+        ch.error(ctx, "Invalid bugid: %s" % bs)
+    b = int(bs)
     if b in ch.bugids:
         ch.error(ctx, "Bugid %d used more than once in this changeset" % b)
     ch.bugids.append(b)

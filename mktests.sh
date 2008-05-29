@@ -157,6 +157,12 @@ Reviewed-by: duke"
 fail ci -m "nobugid: No bugid
 Reviewed-by: duke"
 
+fail ci -m "0000000: Bad bugid
+Reviewed-by: duke"
+
+fail ci -m "9999999: Bad bugid
+Reviewed-by: duke"
+
 pass ci -m "$(bugid): The next bug
 Reviewed-by: mr, wetmore"
 
