@@ -156,7 +156,7 @@ con_check = re.compile("Contributed-by: ((" + addr_pat + ")(, (" + addr_pat + ")
 
 def bug_validate(ch, ctx, m, pn):
     bs = m.group(1)
-    if not (bs[0] in ['1','2','4','6']):
+    if not (bs[0] in ['1','2','4','5','6']):
         ch.error(ctx, "Invalid bugid: %s" % bs)
     b = int(bs)
     if b in ch.cs_bugids:
@@ -239,6 +239,15 @@ class checker(object):
         self.cs_contributor = None      # Contributor of current changeset
         self.strict = strict
         self.conf = load_conf(repo.root)
+
+        # Bogus yet historically-accepted changesets,
+        # so that jcheck may evolve
+        self.whitelist = [
+            '31000d79ec713de1e601dc16d74d726edd661ed5',
+            'b7987d19f5122a9f169e568f935b7cdf1a2609f5',
+            'c70a245cad3ad74602aa26b9d8e3d0472f7317c3',
+            'e8e20316458c1cdb85d9733a2e357e438a76a859',
+            'f68325221ce1efe94ab367400a49a8039d9b3db3' ]
 
     def summarize(self, ctx):
         self.ui.status("\n")
@@ -355,6 +364,9 @@ class checker(object):
         self.cs_reviewers = [ ]
         self.cs_contributor = None
         ctx = context.changectx(self.repo, node)
+        if hex(node) in self.whitelist:
+            self.ui.note("%s in whitelist; skipping\n" % hex(node))
+            return Pass
         self.ui.debug(oneline(ctx))
         for c in self.checks:
             cf = checker.__dict__[c]
