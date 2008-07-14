@@ -120,6 +120,36 @@ for t in jdk7-b01 jdk7-b123 hs11.1-b02; do
   r=$(expr $r + 1)
 done
 
+# Black/white lists
+
+blackhash=b5dd894e33c0dfa6cde0c5c5fd1f7a7e5edd6f01
+whitehash=1c3c89ae5adcd57d074a268c5328df476ccabf52
+rm -rf z
+hg init z
+mkdir z/.jcheck
+echo 'project=jdk7' >z/.jcheck/conf
+
+cat >z/.hg/hgrc <<___
+[extensions]
+jcheck_test = $(pwd)/../jcheck_test.py
+___
+
+echo "-- $r blacklist"
+echo foo >z/foo
+hg add -R z z/foo
+HGUSER=$setup_author hg ci -R z -m '1010101: Good but black
+Reviewed-by: duke' -d '0 0'
+if hg jcheck_test --black $blackhash -R z -r tip; then fail; fi
+r=$(expr $r + 1)
+
+echo "-- $r whitelist"
+echo foobar >z/foo
+HGUSER=$setup_author hg ci -R z -m '1010101: Bad but white' -d '0 0'
+if hg jcheck_test --white $whitehash -R z -r tip; then true; else fail; fi
+r=$(expr $r + 1)
+
+rm -rf z
+
 
 # Summary
 

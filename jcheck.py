@@ -65,7 +65,7 @@ Pass = False
 Fail = True
 
 def oneline(ctx):
-    return ("%d:%s by %s on %s: %s\n"
+    return ("%5d:%s  %-12s  %s  %s\n"
             % (ctx.rev(), short(ctx.node()), ctx.user(),
                util.datestr(ctx.date(), format="%Y-%m-%d %H:%M",
                             timezone=False),
@@ -221,6 +221,27 @@ def repo_bugids(ui, repo):
     return bugids
 
 
+
+# Black/white lists
+## The black/white lists should really be in the database
+
+# Bogus yet historically-accepted changesets,
+# so that jcheck may evolve
+#
+changeset_whitelist = [
+    '31000d79ec713de1e601dc16d74d726edd661ed5',
+    'b7987d19f5122a9f169e568f935b7cdf1a2609f5',
+    'c70a245cad3ad74602aa26b9d8e3d0472f7317c3',
+    'e8e20316458c1cdb85d9733a2e357e438a76a859',
+    'f68325221ce1efe94ab367400a49a8039d9b3db3' ]
+
+# Bad changesets that should never be allowed in
+#
+changeset_blacklist = [
+    'd3c74bae36884525be835ea428293bb6e7fa54d3' ]
+
+
+
 # Checker class
 
 class checker(object):
@@ -239,15 +260,6 @@ class checker(object):
         self.cs_contributor = None      # Contributor of current changeset
         self.strict = strict
         self.conf = load_conf(repo.root)
-
-        # Bogus yet historically-accepted changesets,
-        # so that jcheck may evolve
-        self.whitelist = [
-            '31000d79ec713de1e601dc16d74d726edd661ed5',
-            'b7987d19f5122a9f169e568f935b7cdf1a2609f5',
-            'c70a245cad3ad74602aa26b9d8e3d0472f7317c3',
-            'e8e20316458c1cdb85d9733a2e357e438a76a859',
-            'f68325221ce1efe94ab367400a49a8039d9b3db3' ]
 
     def summarize(self, ctx):
         self.ui.status("\n")
@@ -336,7 +348,7 @@ class checker(object):
         modified, added = changes[:2]
         # ## Skip files that were renamed but not modified
         files = modified + added
-        self.ui.note("Checking files: %s\n" % ", ".join(files))
+        self.ui.debug("Checking files: %s\n" % ", ".join(files))
         for f in files:
             if ctx.rev() == 0:
                 ## This is loathsome
@@ -357,6 +369,10 @@ class checker(object):
             if fm.linkf(f):
                 self.error(ctx, "%s: Symbolic links not permitted" % f)
 
+    def c_03_hash(self, ctx):
+        if hex(ctx.node()) in changeset_blacklist:
+            self.error(ctx, "Blacklisted changeset: %s" % hex(ctx.node()))
+
     def check(self, node):
         self.summarized = False
         self.cs_bugids = [ ]
@@ -364,10 +380,10 @@ class checker(object):
         self.cs_reviewers = [ ]
         self.cs_contributor = None
         ctx = context.changectx(self.repo, node)
-        if hex(node) in self.whitelist:
+        self.ui.note(oneline(ctx))
+        if hex(node) in changeset_whitelist:
             self.ui.note("%s in whitelist; skipping\n" % hex(node))
             return Pass
-        self.ui.debug(oneline(ctx))
         for c in self.checks:
             cf = checker.__dict__[c]
             cf(self, ctx)
@@ -465,5 +481,5 @@ opts = [("r", "rev", [], "check the specified revision or range (default: tip)")
 help = "[-r rev] [-s]"
 
 cmdtable = {
-    "jcheck": (jcheck, opts, "hg jcheck [-r rev] [-s]")
+    "jcheck": (jcheck, opts, "hg jcheck " + help)
 }
