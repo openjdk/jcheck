@@ -238,7 +238,11 @@ changeset_whitelist = [
 # Bad changesets that should never be allowed in
 #
 changeset_blacklist = [
-    'd3c74bae36884525be835ea428293bb6e7fa54d3' ]
+    'd3c74bae36884525be835ea428293bb6e7fa54d3',
+    '2bb5ef5c8a2dc0a32b1cd67803128ce12cad461e',
+    '4ff95cec682e67a374f9c5725d1879f43624d888',
+    '75f1884152db275047a09aa6085ae7c49e3f4126',
+    '6ecad8bfb1e5d34aef2ca61d30c1d197745d6844' ]
 
 
 
