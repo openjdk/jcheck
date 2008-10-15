@@ -374,10 +374,18 @@ class checker(object):
                     ln = data.count("\n", 0, m.start()) + 1
                     self.error(ctx, "%s:%d: %s" % (f, ln, badwhite_what(m)))
             ## check_file_header(self, fx, data)
-            fm = fx.manifest()
-            if fm.execf(f):
+            flags = ''
+            try:
+                flags = fx.flags() # mercurial 1.0.2 and later
+            except AttributeError:
+                fm = fx.manifest() # mercurial 1.0.1 and earlier
+                if fm.linkf(f):
+                    flags = 'l'
+                if fm.execf(f):
+                    flags = flags + 'x'
+            if 'x' in flags:
                 self.error(ctx, "%s: Executable files not permitted" % f)
-            if fm.linkf(f):
+            if 'l' in flags:
                 self.error(ctx, "%s: Symbolic links not permitted" % f)
 
     def c_03_hash(self, ctx):
