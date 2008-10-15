@@ -64,11 +64,13 @@ from mercurial import cmdutil, patch, util, context, templater
 Pass = False
 Fail = True
 
+def datestr(ctx):
+    # Mercurial 0.9.5 and earlier append a time zone; strip it.
+    return util.datestr(ctx.date(), format="%Y-%m-%d %H:%M")[:16]
+    
 def oneline(ctx):
     return ("%5d:%s  %-12s  %s  %s\n"
-            % (ctx.rev(), short(ctx.node()), ctx.user(),
-               util.datestr(ctx.date(), format="%Y-%m-%d %H:%M",
-                            timezone=False),
+            % (ctx.rev(), short(ctx.node()), ctx.user(), datestr(ctx),
                ctx.description().splitlines()[0]))
 
 def is_merge(repo, rev):
@@ -272,7 +274,7 @@ class checker(object):
         self.ui.status("\n")
         self.ui.status("> Changeset: %d:%s\n" % (ctx.rev(), short(ctx.node())))
         self.ui.status("> Author:    %s\n" % ctx.user())
-        self.ui.status("> Date:      %s\n" % templater.isodate(ctx.date()))
+        self.ui.status("> Date:      %s\n" % datestr(ctx))
         self.ui.status(">\n> ")
         self.ui.status("\n> ".join(ctx.description().splitlines()))
         self.ui.status("\n\n")
