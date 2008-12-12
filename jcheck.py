@@ -483,8 +483,6 @@ def jcheck(ui, repo, **opts):
     for st, rev, fns in changeiter:
         if st == 'add':
             node = repo.changelog.node(rev)
-            parents = [p for p in repo.changelog.parentrevs(rev)
-                       if p != nullrev]
             if ui.debugflag:
                 displayer.show(rev, node, copies=False)
             ch.check(node)
