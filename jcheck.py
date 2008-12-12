@@ -446,7 +446,8 @@ def hook(ui, repo, hooktype, node=None, source=None, **opts):
     ch.check_repo()
     firstnode = bin(node)
     start = repo.changelog.rev(firstnode)
-    end = repo.changelog.count()
+    end = (hasattr(repo.changelog, 'count') and repo.changelog.count() or
+           len(repo.changelog))
     for rev in xrange(start, end):
         ch.check(repo.changelog.node(rev))
     if ch.rv == Fail:
