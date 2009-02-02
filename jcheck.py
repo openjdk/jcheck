@@ -1,5 +1,5 @@
 #
-# Copyright 2007-2008 Sun Microsystems, Inc.  All Rights Reserved.
+# Copyright 2007-2009 Sun Microsystems, Inc.  All Rights Reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 # 
 # This code is free software; you can redistribute it and/or modify it
@@ -264,6 +264,9 @@ class checker(object):
         self.cs_contributor = None      # Contributor of current changeset
         self.strict = strict
         self.conf = load_conf(repo.root)
+        self.whitespace_lax = False
+        if self.conf.has_key("whitespace") and self.conf["whitespace"] == "lax":
+            self.whitespace_lax = True
 
     def summarize(self, ctx):
         self.ui.status("\n")
@@ -306,7 +309,9 @@ class checker(object):
             ## Should check tag itself
             return
 
-        if ctx.rev() == 0 and ctx.description() == "Initial load":
+        if (ctx.rev() == 0
+            and ctx.user() == "duke"
+            and ctx.description().startswith("Initial load")):
             return
 
         lns = ctx.description().splitlines()
@@ -360,7 +365,7 @@ class checker(object):
                 if f.startswith("test/com/sun/javadoc/test"): continue
                 if f.startswith("docs/technotes/guides"): continue
             fx = ctx.filectx(f)
-            if normext_re.match(f):
+            if normext_re.match(f) and not self.whitespace_lax:
                 data = fx.data()
                 m = badwhite_re.search(data)
                 if m:
