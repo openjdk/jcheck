@@ -4,7 +4,9 @@ export HGRCPATH=
 
 # No insult intended here -- we just need valid author names for the tests
 pass_author=ohair
+pass_author_lax=andrew
 fail_author=mr
+fail_author_lax=robilad
 setup_author=xdono
 
 cd $(dirname $0)/tests
@@ -25,9 +27,12 @@ fail() {
 r=0
 while [ $r -le $last ]; do
   au=$(hg log -r $r --template '{author}')
+  lax=
   case $au in
     $pass_author) type=pass;;
+    $pass_author_lax) type=pass; lax='--lax';;
     $fail_author) type=fail;;
+    $fail_author_lax) type=fail; lax='--lax';;
     $setup_author) type=setup;;
     *) type=$au;;
   esac
@@ -36,7 +41,7 @@ while [ $r -le $last ]; do
     r=$(expr $r + 1)
     continue
   fi
-  hg jcheck -r $r "$@"
+  hg jcheck $lax -r $r "$@"
   rv=$?
   case $type in
     pass) if [ $rv != 0 ]; then fail $r; fi;;
@@ -44,7 +49,6 @@ while [ $r -le $last ]; do
   esac
   r=$(expr $r + 1)
 done
-
 
 # Cases that require richer logic
 

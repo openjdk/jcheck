@@ -4,7 +4,9 @@ export HGRCPATH=
 
 # No insult intended here -- we just need valid author names for the tests
 pass_author=ohair
+pass_author_lax=andrew
 fail_author=mr
+fail_author_lax=robilad
 setup_author=xdono
 
 rm -rf tests
@@ -49,7 +51,9 @@ Reviewed-by: duke"
 }
 
 pass() { test $pass_author "$@"; }
+pass_lax() { test $pass_author_lax "$@"; }
 fail() { test $fail_author "$@"; }
+fail_lax() { test $fail_author_lax "$@"; }
 setup() { test $setup_author "$@"; }
 
 
@@ -273,3 +277,25 @@ Reviewed-by: $pass_author, $setup_author"
 pass ci -m "$(bugid): Self-review of a contribution
 Reviewed-by: $pass_author
 Contributed-by: ben@bits.org"
+
+
+# Lax changeset comments
+
+pass_lax ci -m "Foo bar baz"
+
+pass_lax ci -m "Foo bar baz
+$(bugid): Random bug
+Blah blah
+Reviewed-by: jcoomes"
+
+pass_lax ci -m "Foo bar baz
+Reviewed-by: jcoomes"
+
+pass_lax ci -m "Foo bar baz
+Contributed-by: Ben Bitdiddle <ben@bits.org>"
+
+fail_lax ci -m "Foo bar baz
+Contributed-by: Ben Bitdiddle"
+
+fail_lax ci -m "Foo bar baz
+Reviewed-by: $fail_author_lax"

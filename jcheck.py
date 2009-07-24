@@ -201,6 +201,12 @@ comment_grammar = [
           con_ident, con_check, validator=con_validate, min=0, max=1)
 ]
 
+def checked_comment_line(ln):
+    for st in comment_grammar:
+        if st.ident_pattern.match(ln):
+            return True
+    return False
+
 def repo_bugids(ui, repo):
     # Should cache this, eventually
     get = util.cachefunc(lambda r: repo.changectx(r).changeset())
@@ -252,7 +258,7 @@ changeset_blacklist = [
 
 class checker(object):
 
-    def __init__(self, ui, repo, repo_bugids, strict):
+    def __init__(self, ui, repo, repo_bugids, strict, lax):
         self.ui = ui
         self.repo = repo
         self.rv = Pass
@@ -266,9 +272,12 @@ class checker(object):
         self.cs_contributor = None      # Contributor of current changeset
         self.strict = strict
         self.conf = load_conf(repo.root)
-        self.whitespace_lax = False
+        self.whitespace_lax = lax and not strict
         if self.conf.has_key("whitespace") and self.conf["whitespace"] == "lax":
             self.whitespace_lax = True
+        self.comments_lax = lax and not strict
+        if self.conf.has_key("comments") and self.conf["comments"] == "lax":
+            self.comments_lax = True
 
     def summarize(self, ctx):
         self.ui.status("\n")
@@ -311,12 +320,16 @@ class checker(object):
             ## Should check tag itself
             return
 
-        if (ctx.rev() == 0
+        if ((ctx.rev() == 0 or (ctx.rev() == 1 and self.comments_lax))
             and ctx.user() == "duke"
             and ctx.description().startswith("Initial load")):
             return
 
         lns = ctx.description().splitlines()
+
+        # If lax, filter out non-matching lines
+        if self.comments_lax:
+            lns = filter(checked_comment_line, lns)
 
         i = 0                           # Input index
         gi = 0                          # Grammar index
@@ -336,7 +349,7 @@ class checker(object):
                 if i >= len(lns):
                     break;
                 ln = lns[i]
-            if n < st.min:
+            if n < st.min and not self.comments_lax:
                 self.error(ctx, "Incomplete comment: Missing %s" % st.name)
             if n > st.max:
                 self.error(ctx, "Too many %ss" % st.name)
@@ -346,12 +359,13 @@ class checker(object):
 
         if not self.cs_contributor and [self.cs_author] == self.cs_reviewers:
             self.error(ctx, "Self-reviews not permitted")
-        if (gi == 0 and n > 0):
-            self.error(ctx, "Incomplete comment: Missing bugid line")
-        elif gi == 1 or (gi == 2 and n == 0):
-            self.error(ctx, "Incomplete comment: Missing reviewer attribution")
-        if (i < len(lns)):
-            self.error(ctx, "Extraneous text in comment")
+        if not self.comments_lax:
+            if (gi == 0 and n > 0):
+                self.error(ctx, "Incomplete comment: Missing bugid line")
+            elif gi == 1 or (gi == 2 and n == 0):
+                self.error(ctx, "Incomplete comment: Missing reviewer attribution")
+            if (i < len(lns)):
+                self.error(ctx, "Extraneous text in comment")
 
     def c_02_files(self, ctx):
         changes = self.repo.status(ctx.parents()[0].node(),
@@ -359,7 +373,8 @@ class checker(object):
         modified, added = changes[:2]
         # ## Skip files that were renamed but not modified
         files = modified + added
-        self.ui.debug("Checking files: %s\n" % ", ".join(files))
+        if self.ui.debugflag:
+            self.ui.debug("Checking files: %s\n" % ", ".join(files))
         for f in files:
             if ctx.rev() == 0:
                 ## This is loathsome
@@ -442,7 +457,10 @@ def hook(ui, repo, hooktype, node=None, source=None, **opts):
         ui.note("jcheck not enabled (no .jcheck in repository root); skipping\n")
         return Pass
     strict = opts.has_key("strict") and opts["strict"]
-    ch = checker(ui, repo, repo_bugids(ui, repo), strict)
+    lax = opts.has_key("lax") and opts["lax"]
+    if strict:
+        lax = False
+    ch = checker(ui, repo, repo_bugids(ui, repo), strict, lax)
     ch.check_repo()
     firstnode = bin(node)
     start = repo.changelog.rev(firstnode)
@@ -473,12 +491,16 @@ def jcheck(ui, repo, **opts):
     if len(opts["rev"]) == 0:
         opts["rev"] = ["tip"]
 
-    ch = checker(ui, repo, repo_bugids(ui, repo), False)
+    strict = opts.has_key("strict") and opts["strict"]
+    lax = opts.has_key("lax") and opts["lax"]
+    if strict:
+        lax = False
+    ch = checker(ui, repo, repo_bugids(ui, repo), strict, lax)
     ch.check_repo()
 
     get = util.cachefunc(lambda r: repo.changectx(r).changeset())
     changeiter, matchfn = cmdutil.walkchangerevs(ui, repo, [], get, opts)
-    if ui.debug:
+    if ui.debugflag:
         displayer = cmdutil.show_changeset(ui, repo, opts, True, matchfn)
     for st, rev, fns in changeiter:
         if st == 'add':
@@ -493,7 +515,8 @@ def jcheck(ui, repo, **opts):
         ui.status("\n")
     return ch.rv
 
-opts = [("r", "rev", [], "check the specified revision or range (default: tip)"),
+opts = [("", "lax", False, "Check comments and whitespace laxly"),
+        ("r", "rev", [], "check the specified revision or range (default: tip)"),
         ("s", "strict", False, "check everything")]
 
 help = "[-r rev] [-s]"
