@@ -241,7 +241,8 @@ changeset_whitelist = [
     'b7987d19f5122a9f169e568f935b7cdf1a2609f5',
     'c70a245cad3ad74602aa26b9d8e3d0472f7317c3',
     'e8e20316458c1cdb85d9733a2e357e438a76a859',
-    'f68325221ce1efe94ab367400a49a8039d9b3db3' ]
+    'f68325221ce1efe94ab367400a49a8039d9b3db3',
+    '4dfa5d67c44500155ce9ab1e00d0de21bdbb9ee6' ]
 
 # Bad changesets that should never be allowed in
 #
@@ -251,7 +252,8 @@ changeset_blacklist = [
     '4ff95cec682e67a374f9c5725d1879f43624d888',
     '75f1884152db275047a09aa6085ae7c49e3f4126',
     '6ecad8bfb1e5d34aef2ca61d30c1d197745d6844',
-    '4ec7d1890538c54a3cc7559e88db5a5e3371fe5d' ]
+    '4ec7d1890538c54a3cc7559e88db5a5e3371fe5d',
+    '669768c591ac438f4ca26d5cbdde7486ce49a2e2' ]
 
 
 
