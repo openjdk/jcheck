@@ -164,7 +164,7 @@ def bug_validate(ch, ctx, m, pn):
     if b in ch.cs_bugids:
         ch.error(ctx, "Bugid %d used more than once in this changeset" % b)
     ch.cs_bugids.append(b)
-    if b in ch.repo_bugids:
+    if not ch.bugids_allow_dups and b in ch.repo_bugids:
         r = ch.repo_bugids[b]
         if r < ctx.rev():
             ch.error(ctx, ("Bugid %d already used in this repository, in revision %d "
@@ -276,11 +276,12 @@ class checker(object):
         self.strict = strict
         self.conf = load_conf(repo.root)
         self.whitespace_lax = lax and not strict
-        if self.conf.has_key("whitespace") and self.conf["whitespace"] == "lax":
+        if self.conf.get("whitespace") == "lax":
             self.whitespace_lax = True
         self.comments_lax = lax and not strict
-        if self.conf.has_key("comments") and self.conf["comments"] == "lax":
+        if self.conf.get("comments") == "lax":
             self.comments_lax = True
+        self.bugids_allow_dups = self.conf.get("bugids") == "dup"
 
     def summarize(self, ctx):
         self.ui.status("\n")

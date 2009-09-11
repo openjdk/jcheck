@@ -21,7 +21,6 @@ fail() {
   if [ $FAILFIRST ]; then exit 2; fi
 }
 
-
 # Cases created by mktests
 
 r=0
@@ -152,8 +151,23 @@ HGUSER=$setup_author hg ci -R z -m '1010101: Bad but white' -d '0 0'
 if hg jcheck_test --white $whitehash -R z -r tip; then true; else fail; fi
 r=$(expr $r + 1)
 
-rm -rf z
+# Duplicate bugids
 
+rm -rf z
+hg init z
+mkdir z/.jcheck
+cat >z/.jcheck/conf <<___
+project=jdk7
+comments=lax
+bugids=dup
+___
+hg add -R z z/.jcheck/conf
+
+HGUSER=$setup_author hg ci -R z -m '1111111: Foo!' -d '0 0'
+touch z/foo
+hg add -R z z/foo
+if HGUSER=$setup_author hg ci -R z -m '1111111: Foo!'; then true; else fail; fi
+r=$(expr $r + 1)
 
 # Summary
 
