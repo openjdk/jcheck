@@ -208,22 +208,32 @@ def checked_comment_line(ln):
     return False
 
 def repo_bugids(ui, repo):
+    def addbugids(bugids, ctx):
+        lns = ctx.description().splitlines()
+        for ln in lns:
+            m = bug_ident.match(ln)
+            if m:
+                b = int(m.group(1))
+                if not b in bugids:
+                    bugids[b] = ctx.rev()
+        
     # Should cache this, eventually
-    get = util.cachefunc(lambda r: repo.changectx(r).changeset())
-    changeiter, matchfn = cmdutil.walkchangerevs(ui, repo, [], get,
-                                                 { "rev" : ["0:tip"] })
     bugids = { }                        # bugid -> rev
-    for st, rev, fns in changeiter:
-        if st == 'add':
-            node = repo.changelog.node(rev)
-            ctx = context.changectx(repo, node)
-            lns = ctx.description().splitlines()
-            for ln in lns:
-                m = bug_ident.match(ln)
-                if m:
-                    b = int(m.group(1))
-                    if not b in bugids:
-                        bugids[b] = rev
+    opts = { 'rev' : ['0:tip'] }
+    try:
+        nop = lambda c, fns: None
+        iter = cmdutil.walkchangerevs(repo, cmdutil.matchall(repo), opts, nop)
+        for ctx in iter:
+            addbugids(bugids, ctx)
+    except (AttributeError, TypeError):
+        # AttributeError:  matchall does not exist in hg < 1.1
+        # TypeError:  walkchangerevs args differ in hg <= 1.3.1
+        get = util.cachefunc(lambda r: repo.changectx(r).changeset())
+        changeiter, matchfn = cmdutil.walkchangerevs(ui, repo, [], get, opts)
+        for st, rev, fns in changeiter:
+            if st == 'add':
+                node = repo.changelog.node(rev)
+                addbugids(bugids, context.changectx(repo, node))
     if ui.debugflag:
         ui.debug("Bugids: %s\n" % bugids)
     return bugids
@@ -502,19 +512,28 @@ def jcheck(ui, repo, **opts):
     ch = checker(ui, repo, repo_bugids(ui, repo), strict, lax)
     ch.check_repo()
 
-    get = util.cachefunc(lambda r: repo.changectx(r).changeset())
-    changeiter, matchfn = cmdutil.walkchangerevs(ui, repo, [], get, opts)
-    if ui.debugflag:
-        displayer = cmdutil.show_changeset(ui, repo, opts, True, matchfn)
-    for st, rev, fns in changeiter:
-        if st == 'add':
-            node = repo.changelog.node(rev)
-            if ui.debugflag:
-                displayer.show(rev, node, copies=False)
-            ch.check(node)
-        elif st == 'iter':
-            if ui.debugflag:
-                displayer.flush(rev)
+    try:
+        nop = lambda c, fns: None
+        iter = cmdutil.walkchangerevs(repo, cmdutil.matchall(repo), opts, nop)
+        for ctx in iter:
+            ch.check(ctx.node())
+    except (AttributeError, TypeError):
+        # AttributeError:  matchall does not exist in hg < 1.1
+        # TypeError:  walkchangerevs args differ in hg <= 1.3.1
+        get = util.cachefunc(lambda r: repo.changectx(r).changeset())
+        changeiter, matchfn = cmdutil.walkchangerevs(ui, repo, [], get, opts)
+        if ui.debugflag:
+            displayer = cmdutil.show_changeset(ui, repo, opts, True, matchfn)
+        for st, rev, fns in changeiter:
+            if st == 'add':
+                node = repo.changelog.node(rev)
+                if ui.debugflag:
+                    displayer.show(rev, node, copies=False)
+                ch.check(node)
+            elif st == 'iter':
+                if ui.debugflag:
+                    displayer.flush(rev)
+
     if ch.rv == Fail:
         ui.status("\n")
     return ch.rv
