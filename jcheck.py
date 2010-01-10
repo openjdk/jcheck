@@ -1,5 +1,5 @@
 #
-# Copyright 2007-2009 Sun Microsystems, Inc.  All Rights Reserved.
+# Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 # 
 # This code is free software; you can redistribute it and/or modify it
@@ -134,7 +134,7 @@ badwhite_re = re.compile("(\t)|([ \t]$)|\r", re.MULTILINE)
 normext_re = re.compile(".*\.(java|c|h|cpp|hpp)$")
 
 tag_desc_re = re.compile("Added tag [^ ]+ for changeset [0-9a-f]{12}")
-tag_re = re.compile("tip|jdk[67]-b\d{2,3}|hs\d\d.\d-b\d\d")
+tag_re = re.compile("tip$|jdk[67]-b\d{2,3}$|hs\d\d(\.\d{1,2})?-b\d\d$")
 
 def badwhite_what(m):
     if m.group(1):
