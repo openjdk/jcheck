@@ -9,7 +9,8 @@ tests: mktests.sh ; sh mktests.sh
 
 .PHONY: FORCE
 
-pub: jcheck.py.pub
+publish: jcheck.py.pub
+	chmod g+w $<
 	scp -p $< $(DST)/jcheck.py
 
 jcheck.py.pub: jcheck.py
