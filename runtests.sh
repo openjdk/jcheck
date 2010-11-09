@@ -162,6 +162,24 @@ Reviewed-by: duke' -d '0 0'
 if hg jcheck_test --black $blackhash -R z -r tip; then fail; fi
 r=$(expr $r + 1)
 
+echo "-- $r blacklist file 1"
+echo "$blackhash # blacklisted" > blacklist
+if hg jcheck_test -R z -r tip; then fail; fi
+rm -f blacklist
+r=$(expr $r + 1)
+
+echo "-- $r blacklist file 2"
+echo "	$blackhash#" > blacklist
+if hg jcheck_test -R z -r tip; then fail; fi
+rm -f blacklist
+r=$(expr $r + 1)
+
+echo "-- $r blacklist file 3"
+echo "#	$blackhash # not really blacklisted" > blacklist
+if hg jcheck_test -R z -r tip; then true; else fail; fi
+rm -f blacklist
+r=$(expr $r + 1)
+
 echo "-- $r whitelist"
 echo foobar >z/foo
 HGUSER=$setup_author hg ci -R z -m '1010101: Bad but white' -d '0 0'

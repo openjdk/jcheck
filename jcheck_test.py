@@ -39,6 +39,7 @@ def jcheck_test(ui, repo, **opts):
         jcheck.changeset_whitelist = opts["white"]
     if len(opts["black"]) != 0:
         jcheck.changeset_blacklist = opts["black"]
+    jcheck.blacklist_file = "./blacklist"
     del opts["white"]
     del opts["black"]
     return jcheck.jcheck(ui, repo, **opts)

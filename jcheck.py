@@ -266,6 +266,8 @@ changeset_blacklist = [
     '669768c591ac438f4ca26d5cbdde7486ce49a2e2',
     '2ded3bb1452943d5273e7b83af9609ce6511a105' ]
 
+# Path to file containing additional blacklisted changesets
+blacklist_file = '/oj/db/blacklist'
 
 
 # Checker class
@@ -293,6 +295,20 @@ class checker(object):
         if self.conf.get("comments") == "lax":
             self.comments_lax = True
         self.bugids_allow_dups = self.conf.get("bugids") == "dup"
+        self.blacklist = dict.fromkeys(changeset_blacklist)
+        self.read_blacklist(blacklist_file)
+
+    def read_blacklist(self, fname):
+        if not os.path.exists(fname):
+            return
+        self.ui.debug('Reading blacklist file %s\n' % fname)
+        f = open(fname)
+        for line in f:
+            # Any comment after the changeset hash becomes the dictionary value.
+            l = [s.strip() for s in line.split('#', 1)]
+            if l and l[0]:
+                self.blacklist[l[0]] = len(l) == 2 and l[1] or None
+        f.close()
 
     def summarize(self, ctx):
         self.ui.status("\n")
@@ -419,8 +435,9 @@ class checker(object):
                 self.error(ctx, "%s: Symbolic links not permitted" % f)
 
     def c_03_hash(self, ctx):
-        if hex(ctx.node()) in changeset_blacklist:
-            self.error(ctx, "Blacklisted changeset: %s" % hex(ctx.node()))
+        hash = hex(ctx.node())
+        if hash in self.blacklist:
+            self.error(ctx, "Blacklisted changeset: " + hash)
 
     def check(self, node):
         self.summarized = False
