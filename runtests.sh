@@ -107,8 +107,22 @@ r=$(expr $r + 1)
 
 # Tags
 
+# hg 1.6 and later strip whitespace from tag names (hg issue1217), so test a
+# tag with trailing whitespace only in earlier versions.
+whitespace_tag='jdk7-b01 '
+hg -q version | python -c '
+import sys, re;
+m = re.search("version ([0-9]+)\.([0-9]+)", sys.stdin.readline())
+if m:
+    major = int(m.group(1))
+    minor = int(m.group(2))
+    if major == 1 and minor > 5 or major > 1:
+       sys.exit(0) # version >= 1.6
+sys.exit(1)'
+[ $? -eq 0 ] && whitespace_tag=jdk7-b2 # a tag that should be rejected
+
 HG='hg --config hooks.pretxncommit.jcheck=python:jcheck.hook'
-for t in foo tiptoe jdk7 jdk7-b1 jdk7-b01' ' \
+for t in foo tiptoe jdk7 jdk7-b1 "$whitespace_tag" \
          hs1-b02 hs11-b3 hs12-b004 hs13.001-b05 \
         jdk6u22 jdk6u222-b01 jdk6u-b01 jdk6u11-b1 ; do
   echo "-- $r tag $t"
