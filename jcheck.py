@@ -158,7 +158,7 @@ con_check = re.compile("Contributed-by: ((" + addr_pat + ")(, (" + addr_pat + ")
 
 def bug_validate(ch, ctx, m, pn):
     bs = m.group(1)
-    if not (bs[0] in ['1','2','4','5','6']):
+    if not (bs[0] in ['1','2','4','5','6','7']):
         ch.error(ctx, "Invalid bugid: %s" % bs)
     b = int(bs)
     if b in ch.cs_bugids:

@@ -164,11 +164,17 @@ Reviewed-by: duke"
 fail ci -m "0000000: Bad bugid
 Reviewed-by: duke"
 
-fail ci -m "9999999: Bad bugid
+for i in 1 2 4 5 6 7
+do
+    pass ci -m "${i}112222: bugid ${i}xxxxxx
 Reviewed-by: duke"
+done
 
-pass ci -m "5112222: Fives bugid
+for i in 3 8 9
+do
+    fail ci -m "${i}112222: bugid ${i}xxxxxx
 Reviewed-by: duke"
+done
 
 pass ci -m "$(bugid): The next bug
 Reviewed-by: mr, wetmore"
