@@ -132,8 +132,9 @@ for t in foo tiptoe jdk7 jdk7-b1 "$whitespace_tag" \
 done
 
 HG='hg --config hooks.pretxncommit.jcheck=python:jcheck.hook'
-for t in jdk7-b01 jdk7-b123 hs11-b02 hs12.1-b11 hs13.10-b12 \
-        jdk6u22-b01 jdk6u99-b999 jdk7u1-b01 ; do
+for t in jdk4-b01 jdk5-b01 jdk6-b01 jdk7-b01 jdk8-b01 jdk4-b100 jdk8-b800 \
+        jdk4u4-b04 jdk5u5-b05 jdk6u6-b06 jdk7u7-b07 jdk8u8-b08 jdk8u80-b08 \
+        hs11-b02 hs12.1-b11 hs13.10-b12 ; do
   echo "-- $r tag $t"
   if ! HGUSER=$setup_author $HG tag -r 1 "$t"; then fail $r; fi
   hg rollback; hg revert -a; rm .hgtags
