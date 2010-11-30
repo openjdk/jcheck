@@ -267,7 +267,7 @@ changeset_blacklist = [
     '2ded3bb1452943d5273e7b83af9609ce6511a105' ]
 
 # Path to file containing additional blacklisted changesets
-blacklist_file = '/oj/db/blacklist'
+blacklist_file = '/oj/db/hg/blacklist'
 
 
 # Checker class
