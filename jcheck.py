@@ -320,6 +320,8 @@ class checker(object):
         self.ui.status("\n\n")
 
     def error(self, ctx, msg):
+        if self.rv != Fail:
+            self.ui.status("[jcheck %s %s]\n" % (_version, _date))
         if not self.summarized:
             if ctx:
                 self.summarize(ctx)

@@ -152,7 +152,7 @@ echo 'project=jdk7' >z/.jcheck/conf
 
 cat >z/.hg/hgrc <<___
 [extensions]
-jcheck_test = $(pwd)/../jcheck_test.py
+jcheck_test = $(pwd)/jcheck_test.py
 ___
 
 echo "-- $r blacklist"

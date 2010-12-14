@@ -11,12 +11,15 @@ setup_author=xdono
 
 rm -rf tests
 hg init tests
+cp -p jcheck_test.py tests || exit 1
+cp -p jcheck.py.pub tests/jcheck.py || exit 1
+	
 cd tests
 
 cat >.hg/hgrc <<___
 [extensions]
 fetch =
-jcheck = $(pwd)/../jcheck.py
+jcheck = $(pwd)/jcheck.py
 [hooks]
 pretxnchangegroup = python:jcheck.hook
 ___
