@@ -1,5 +1,5 @@
 #
-# Copyright 2007-2010 Sun Microsystems, Inc.  All Rights Reserved.
+# Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 # 
 # This code is free software; you can redistribute it and/or modify it
@@ -264,7 +264,10 @@ changeset_blacklist = [
     '6ecad8bfb1e5d34aef2ca61d30c1d197745d6844',
     '4ec7d1890538c54a3cc7559e88db5a5e3371fe5d',
     '669768c591ac438f4ca26d5cbdde7486ce49a2e2',
-    '2ded3bb1452943d5273e7b83af9609ce6511a105' ]
+    '2ded3bb1452943d5273e7b83af9609ce6511a105',
+    # hsdev/hotspot/{hotspot,master} dup bugid 7019157
+    '0d8777617a2d028ba0b82943c829a5c6623f1479'
+    ]
 
 # Path to file containing additional blacklisted changesets
 blacklist_file = '/oj/db/hg/blacklist'
