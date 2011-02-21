@@ -252,7 +252,12 @@ changeset_whitelist = [
     'c70a245cad3ad74602aa26b9d8e3d0472f7317c3',
     'e8e20316458c1cdb85d9733a2e357e438a76a859',
     'f68325221ce1efe94ab367400a49a8039d9b3db3',
-    '4dfa5d67c44500155ce9ab1e00d0de21bdbb9ee6' ]
+    '4dfa5d67c44500155ce9ab1e00d0de21bdbb9ee6',
+    '73a4d5be86497baf74c1fc194c9a0dd4e86d3a31', # jdk6/jdk6/jaxp bad comment
+    'a25f15bfd04b46a302b6ca1a298c176344f432dd', # jdk6/jdk6/jdk  bad comment
+    'bf87d5af43614d609a5251c43eea44c028500d02', # jdk6/jdk6/jdk  bad comment
+    'd77434402021cebc4c25b452db18bbfd2d7ccda1'  # jdk6/jdk6/jdk  bad comment
+    ]
 
 # Bad changesets that should never be allowed in
 #
