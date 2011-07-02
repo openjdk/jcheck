@@ -271,7 +271,10 @@ changeset_blacklist = [
     '669768c591ac438f4ca26d5cbdde7486ce49a2e2',
     '2ded3bb1452943d5273e7b83af9609ce6511a105',
     # hsdev/hotspot/{hotspot,master} dup bugid 7019157
-    '0d8777617a2d028ba0b82943c829a5c6623f1479'
+    '0d8777617a2d028ba0b82943c829a5c6623f1479',
+    # hsx/hotspot-comp/jdk dup bugid 7052202 + follow-on cset
+    'ad2d483067099421f3ea4492269cce69009b046f',
+    '521e2254994c76441c25f4374e16abbe314d8143'
     ]
 
 # Path to file containing additional blacklisted changesets
