@@ -76,6 +76,13 @@ def oneline(ctx):
 def is_merge(repo, rev):
     return not (-1 in repo.changelog.parentrevs(rev))
 
+_matchall = getattr(cmdutil, 'matchall', None)
+if not _matchall:
+    try:
+        from mercurial import scmutil
+        _matchall = scmutil.matchall
+    except ImportError:
+        pass
 
 # Configuration-file parsing
 
@@ -222,7 +229,7 @@ def repo_bugids(ui, repo):
     opts = { 'rev' : ['0:tip'] }
     try:
         nop = lambda c, fns: None
-        iter = cmdutil.walkchangerevs(repo, cmdutil.matchall(repo), opts, nop)
+        iter = cmdutil.walkchangerevs(repo, _matchall(repo), opts, nop)
         for ctx in iter:
             addbugids(bugids, ctx)
     except (AttributeError, TypeError):
@@ -540,7 +547,7 @@ def jcheck(ui, repo, **opts):
 
     try:
         nop = lambda c, fns: None
-        iter = cmdutil.walkchangerevs(repo, cmdutil.matchall(repo), opts, nop)
+        iter = cmdutil.walkchangerevs(repo, _matchall(repo), opts, nop)
         for ctx in iter:
             ch.check(ctx.node())
     except (AttributeError, TypeError):
