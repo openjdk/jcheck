@@ -318,6 +318,8 @@ class checker(object):
         self.bugids_allow_dups = self.conf.get("bugids") == "dup"
         self.blacklist = dict.fromkeys(changeset_blacklist)
         self.read_blacklist(blacklist_file)
+        # hg < 1.0 does not have localrepo.tagtype()
+        self.tagtype = getattr(self.repo, 'tagtype', lambda k: 'global')
 
     def read_blacklist(self, fname):
         if not os.path.exists(fname):
@@ -473,8 +475,9 @@ class checker(object):
     def check_repo(self):
 
         ts = self.repo.tags().keys()
+        ignoredtypes = ['local']
         for t in ts:
-            if not tag_re.match(t):
+            if not tag_re.match(t) and not self.tagtype(t) in ignoredtypes:
                 self.error(None,
                            "Illegal tag name: %s" % t)
 
