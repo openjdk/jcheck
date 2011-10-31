@@ -284,7 +284,9 @@ changeset_blacklist = [
     '521e2254994c76441c25f4374e16abbe314d8143',
     # hsx/hotspot-rt/hotspot wrong bugid 7059288 + associated merge
     'aa5f3f5978991182b8dbbd2b46fdcb47b6371dd9',
-    '709d9389b2bc290dad5a35ec5b5f951b07ce9631'
+    '709d9389b2bc290dad5a35ec5b5f951b07ce9631',
+    # jdk8/awt/jdk dup bugid 7100054
+    'f218e6bdf1e8e20ca3f0fdaeb29c38f56afdf988'
     ]
 
 # Path to file containing additional blacklisted changesets
