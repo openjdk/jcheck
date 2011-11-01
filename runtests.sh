@@ -188,7 +188,7 @@ if hg jcheck_test --white $whitehash -R z -r tip; then true; else fail; fi
 r=$(expr $r + 1)
 
 # Duplicate bugids
-
+echo "-- $r duplicate bug ids"
 rm -rf z
 hg init z
 mkdir z/.jcheck
@@ -203,6 +203,34 @@ HGUSER=$setup_author hg ci -R z -m '1111111: Foo!' -d '0 0'
 touch z/foo
 hg add -R z z/foo
 if HGUSER=$setup_author hg ci -R z -m '1111111: Foo!'; then true; else fail; fi
+r=$(expr $r + 1)
+
+# tags=lax tests
+echo "-- $r tags=lax tag check"
+rm -rf z
+hg init z
+mkdir z/.jcheck
+cat >z/.jcheck/conf <<___
+project=jdk7
+tags=lax
+___
+hg add -R z z/.jcheck/conf
+cat >z/.hg/hgrc <<___
+[extensions]
+jcheck = $(pwd)/jcheck.py
+[hooks]
+pretxncommit.jcheck=python:jcheck.hook
+___
+HGUSER=$setup_author hg ci -R z -m '1111111: Foo!' -d '0 0'
+if HGUSER=$setup_author $HG tag -R z -r tip hsparent; then true; else fail; fi
+r=$(expr $r + 1)
+
+echo "-- $r tags=lax comment check"
+touch z/foo
+hg add -R z z/foo
+HGUSER=$setup_author $HG ci -R z -m "Buggy bug bug bug
+Reviewed-by: fang"
+if [ $? -eq 0 ]; then fail; fi
 r=$(expr $r + 1)
 
 # Summary

@@ -317,6 +317,9 @@ class checker(object):
         self.comments_lax = lax and not strict
         if self.conf.get("comments") == "lax":
             self.comments_lax = True
+        self.tags_lax = lax and not strict
+        if self.conf.get("tags") == "lax":
+            self.tags_lax = True
         self.bugids_allow_dups = self.conf.get("bugids") == "dup"
         self.blacklist = dict.fromkeys(changeset_blacklist)
         self.read_blacklist(blacklist_file)
@@ -476,12 +479,13 @@ class checker(object):
 
     def check_repo(self):
 
-        ts = self.repo.tags().keys()
-        ignoredtypes = ['local']
-        for t in ts:
-            if not tag_re.match(t) and not self.tagtype(t) in ignoredtypes:
-                self.error(None,
-                           "Illegal tag name: %s" % t)
+        if not self.tags_lax:
+            ts = self.repo.tags().keys()
+            ignoredtypes = ['local']
+            for t in ts:
+                if not tag_re.match(t) and not self.tagtype(t) in ignoredtypes:
+                    self.error(None,
+                               "Illegal tag name: %s" % t)
 
         bs = self.repo.branchtags()
         if len(bs) > 1:
@@ -576,7 +580,7 @@ def jcheck(ui, repo, **opts):
         ui.status("\n")
     return ch.rv
 
-opts = [("", "lax", False, "Check comments and whitespace laxly"),
+opts = [("", "lax", False, "Check comments, tags and whitespace laxly"),
         ("r", "rev", [], "check the specified revision or range (default: tip)"),
         ("s", "strict", False, "check everything")]
 
