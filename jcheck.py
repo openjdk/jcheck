@@ -286,7 +286,9 @@ changeset_blacklist = [
     'aa5f3f5978991182b8dbbd2b46fdcb47b6371dd9',
     '709d9389b2bc290dad5a35ec5b5f951b07ce9631',
     # jdk8/awt/jdk dup bugid 7100054
-    'f218e6bdf1e8e20ca3f0fdaeb29c38f56afdf988'
+    'f218e6bdf1e8e20ca3f0fdaeb29c38f56afdf988',
+    # jdk7u/jdk7u-dev/jaxp mistaken push
+    '24f4c1185305b60818d255550a0fdc1ddf52c2a6'
     ]
 
 # Path to file containing additional blacklisted changesets
