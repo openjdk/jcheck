@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007, 2011, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2007, 2012, Oracle and/or its affiliates. All rights reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 # 
 # This code is free software; you can redistribute it and/or modify it
@@ -288,7 +288,9 @@ changeset_blacklist = [
     # jdk8/awt/jdk dup bugid 7100054
     'f218e6bdf1e8e20ca3f0fdaeb29c38f56afdf988',
     # jdk7u/jdk7u-dev/jaxp mistaken push
-    '24f4c1185305b60818d255550a0fdc1ddf52c2a6'
+    '24f4c1185305b60818d255550a0fdc1ddf52c2a6',
+    # jdk8/build/pubs executable file
+    '2528f2a1117000eb98891a139e8f839fc5e2bfab'
     ]
 
 # Path to file containing additional blacklisted changesets
