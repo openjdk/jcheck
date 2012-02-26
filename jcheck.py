@@ -263,7 +263,9 @@ changeset_whitelist = [
     '73a4d5be86497baf74c1fc194c9a0dd4e86d3a31', # jdk6/jdk6/jaxp bad comment
     'a25f15bfd04b46a302b6ca1a298c176344f432dd', # jdk6/jdk6/jdk  bad comment
     'bf87d5af43614d609a5251c43eea44c028500d02', # jdk6/jdk6/jdk  bad comment
-    'd77434402021cebc4c25b452db18bbfd2d7ccda1'  # jdk6/jdk6/jdk  bad comment
+    'd77434402021cebc4c25b452db18bbfd2d7ccda1', # jdk6/jdk6/jdk  bad comment
+    '931e5f39e365a0d550d79148ff87a7f9e864d2e1', # hotspot dup bug id 7147064
+    'd8abc90163a4b58db407a60cba331ab21c9977e7'  # hotspot dup bug id 7147064
     ]
 
 # Bad changesets that should never be allowed in
