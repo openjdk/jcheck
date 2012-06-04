@@ -292,7 +292,9 @@ changeset_blacklist = [
     # jdk7u/jdk7u-dev/jaxp mistaken push
     '24f4c1185305b60818d255550a0fdc1ddf52c2a6',
     # jdk8/build/pubs executable file
-    '2528f2a1117000eb98891a139e8f839fc5e2bfab'
+    '2528f2a1117000eb98891a139e8f839fc5e2bfab',
+    # jdk8/2d/jdk/src/closed security fix in wrong forest
+    '8c7fbf082af5ec6d7ad0b1789cedc98a597f1f83'
     ]
 
 # Path to file containing additional blacklisted changesets
