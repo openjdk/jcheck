@@ -24,35 +24,21 @@
 
 # JDK changeset checker
 
-# Configuration
-#
-# In your ~/.hgrc add the following:
+# Quick configuration: Add the following to your ~/.hgrc:
 #
 #   [extensions]
 #   jcheck = /path/to/jcheck.py
 #
-# This will enable the "hg jcheck" subcommand.  "hg help jcheck" will describe
-# the available options.
-#
-# It is additionally recommended that you define the following hooks so that
-# you never create invalid changesets in a working JDK repository:
-#
+#   # Omit these lines if you use Mercurial Queues
 #   [hooks]
 #   pretxnchangegroup.jcheck = python:jcheck.hook
 #   pretxncommit.jcheck = python:jcheck.hook
 #
-# This extension only enforces its checks if the root of the repository upon
-# which it is invoked contains a directory named ".jcheck", so these hooks will
-# not interfere with Mercurial operations upon non-JDK repositories.
-#
-# This extension requires the descriptions of merge changesets to say simply
-# "Merge" rather than, say, "Automated merge with file:///u/mr/ws/jdk7/..."
-# because the latter contains potentially-confidential information.  If you
-# have enabled the "fetch" extension it is therefore also recommended that you
-# add the following to your ~/.hgrc:
-#
+#   # Include this if you use the (deprecated) Mercurial "fetch" extension
 #   [defaults]
 #   fetch = -m Merge
+#
+# For more information: http://openjdk.java.net/projects/code-tools/jcheck/
 
 _version = "@VERSION@"
 _date = "@DATE@"
