@@ -280,7 +280,9 @@ changeset_blacklist = [
     # jdk8/build/pubs executable file
     '2528f2a1117000eb98891a139e8f839fc5e2bfab',
     # jdk8/2d/jdk/src/closed security fix in wrong forest
-    '8c7fbf082af5ec6d7ad0b1789cedc98a597f1f83'
+    '8c7fbf082af5ec6d7ad0b1789cedc98a597f1f83',
+    # jdk7u/jdk7u5/jdk bad fix for 6648202
+    'b06f6d9a6c329792401b954682d49169484b586d'
     ]
 
 # Path to file containing additional blacklisted changesets
