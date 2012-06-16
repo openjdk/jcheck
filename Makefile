@@ -25,7 +25,7 @@ dist: jcheck.py.pub
 	cp -p $< dist/jcheck.py
 	(cd dist; \
 	 hg cat jcheck.py >/dev/null 2>&1 || hg add jcheck.py; \
-	 hg ci -m "jcheck $(VERSION) $(DATE)" -d "$$d" \
+	 hg ci -m "jcheck $(VERSION) $(DATE)" -d "$(DATE)" \
 	 && hg tip)
 
 
