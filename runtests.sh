@@ -44,7 +44,7 @@ while [ $r -le $last ]; do
   rv=$?
   case $type in
     pass) if [ $rv != 0 ]; then fail $r; fi;;
-    fail|fang) if [ $rv == 0 ]; then fail $r; fi;;
+    fail|fang) if [ $rv = 0 ]; then fail $r; fi;;
   esac
   r=$(expr $r + 1)
 done
