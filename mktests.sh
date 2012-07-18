@@ -167,13 +167,13 @@ Reviewed-by: duke"
 fail ci -m "0000000: Bad bugid
 Reviewed-by: duke"
 
-for i in 1 2 4 5 6 7
+for i in 1 2 4 5 6 7 8
 do
     pass ci -m "${i}112222: bugid ${i}xxxxxx
 Reviewed-by: duke"
 done
 
-for i in 3 8 9
+for i in 3 9
 do
     fail ci -m "${i}112222: bugid ${i}xxxxxx
 Reviewed-by: duke"
