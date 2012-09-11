@@ -318,6 +318,9 @@ class checker(object):
         if self.conf.get("tags") == "lax":
             self.tags_lax = True
         self.bugids_allow_dups = self.conf.get("bugids") == "dup"
+        self.bugids_lax = lax and not strict
+        if self.conf.get("bugids") == "lax":
+            self.bugids_lax = True
         self.blacklist = dict.fromkeys(changeset_blacklist)
         self.read_blacklist(blacklist_file)
         # hg < 1.0 does not have localrepo.tagtype()
@@ -399,7 +402,8 @@ class checker(object):
             while (st.ident_pattern.match(ln)):
                 m = st.check_pattern.match(ln)
                 if not m:
-                    self.error(ctx, "Invalid %s" % st.name)
+                    if not (st.name == "bugid line" and self.bugids_lax):
+                        self.error(ctx, "Invalid %s" % st.name)
                 elif st.validator:
                     st.validator(self, ctx, m, self.conf["project"])
                 n = n + 1

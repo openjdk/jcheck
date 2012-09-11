@@ -308,3 +308,5 @@ Contributed-by: Ben Bitdiddle"
 
 fail_lax ci -m "Foo bar baz
 Reviewed-by: $fail_author_lax"
+
+pass_lax ci -m "123: Silly bugid"

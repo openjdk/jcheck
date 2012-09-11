@@ -205,6 +205,21 @@ hg add -R z z/foo
 if HGUSER=$setup_author hg ci -R z -m '1111111: Foo!'; then true; else fail; fi
 r=$(expr $r + 1)
 
+# Lax bugids
+echo "-- $r lax bug ids"
+rm -rf z
+hg init z
+mkdir z/.jcheck
+cat >z/.jcheck/conf <<___
+project=jdk7
+comments=lax
+bugids=lax
+___
+hg add -R z z/.jcheck/conf
+
+if HGUSER=$setup_author hg ci -R z -m '1234: Silly bugid'; then true; else fail; fi
+r=$(expr $r + 1)
+
 # tags=lax tests
 echo "-- $r tags=lax tag check"
 rm -rf z
