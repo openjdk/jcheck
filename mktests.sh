@@ -41,7 +41,7 @@ bugid() {
 
 datefile=date
 
-test() {
+runtest() {
   date >>$datefile; hg add --exclude 'z*'
   export HGUSER=$1; shift
   if [ -z "$*" ]; then
@@ -53,11 +53,11 @@ Reviewed-by: duke"
   fi
 }
 
-pass() { test $pass_author "$@"; }
-pass_lax() { test $pass_author_lax "$@"; }
-fail() { test $fail_author "$@"; }
-fail_lax() { test $fail_author_lax "$@"; }
-setup() { test $setup_author "$@"; }
+pass() { runtest $pass_author "$@"; }
+pass_lax() { runtest $pass_author_lax "$@"; }
+fail() { runtest $fail_author "$@"; }
+fail_lax() { runtest $fail_author_lax "$@"; }
+setup() { runtest $setup_author "$@"; }
 
 
 # Merge-changeset comments
@@ -274,7 +274,7 @@ Reviewed-by: duke"
 fail ci -m "$(bugid): Buggy bug bug bug
 Reviewed-by: fang"
 
-test fang ci -m "$(bugid): Buggy bug bug bug
+runtest fang ci -m "$(bugid): Buggy bug bug bug
 Reviewed-by: jcoomes"
 
 fail ci -m "$(bugid): Solo self-review
