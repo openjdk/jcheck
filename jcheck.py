@@ -283,7 +283,11 @@ changeset_blacklist = [
     # jdk8/2d/jdk/src/closed security fix in wrong forest
     '8c7fbf082af5ec6d7ad0b1789cedc98a597f1f83',
     # jdk7u/jdk7u5/jdk bad fix for 6648202
-    'b06f6d9a6c329792401b954682d49169484b586d'
+    'b06f6d9a6c329792401b954682d49169484b586d',
+    # hsx/hsx24/hotspot/src/closed bad merge
+    '306614eb47a79e6d25a8c7447d0fe47fac28b24c',
+    # hsx/hsx24/hotspot/test/closed bad merge
+    '96163ee390bf223fe0037739fc953e8ed7d49560'
     ]
 
 # Path to file containing additional blacklisted changesets
