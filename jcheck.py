@@ -287,7 +287,11 @@ changeset_blacklist = [
     # hsx/hsx24/hotspot/src/closed bad merge
     '306614eb47a79e6d25a8c7447d0fe47fac28b24c',
     # hsx/hsx24/hotspot/test/closed bad merge
-    '96163ee390bf223fe0037739fc953e8ed7d49560'
+    '96163ee390bf223fe0037739fc953e8ed7d49560',
+    # jdk8/awt/jdk INTJDK-7600365
+    '6be9b0bda6dccbfc738b9173a71a15dcafda4f3b',
+    # jdk8/tl/jdk/test/closed INTJDK-7600460
+    '9eb97a2b3274edff83a362f76bbadb866a97a89b'
     ]
 
 # Path to file containing additional blacklisted changesets
