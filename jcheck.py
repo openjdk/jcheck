@@ -291,7 +291,17 @@ changeset_blacklist = [
     # jdk8/awt/jdk INTJDK-7600365
     '6be9b0bda6dccbfc738b9173a71a15dcafda4f3b',
     # jdk8/tl/jdk/test/closed INTJDK-7600460
-    '9eb97a2b3274edff83a362f76bbadb866a97a89b'
+    '9eb97a2b3274edff83a362f76bbadb866a97a89b',
+    # jdk7u11-dev/jaxp bad fix for 7192390
+    '1642814c94fd0206f8b4f460cc77fa6fc099731a',
+    # jdk7u11-dev/jdk bad fix for 7192390
+    '90eb0407ca69dc572d20490f17239b183bb616b6',
+    # jdk7u11-dev/jdk/test/closed bad fix for 7192390
+    '512af24c6909ef2c766c3a5217c719545de68bf7',
+    # jdk7u11-dev/jdk redone rmi fix
+    'fd6ce0200a7f519380e6863930e92f9182030fa0',
+    # jdk7u11-dev/jdk/test/closed redone rmi fix
+    '770d9cf0e1dc97f7aaa3fdfbb430b27a40b1a3a9',
     ]
 
 # Path to file containing additional blacklisted changesets
