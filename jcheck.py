@@ -302,6 +302,8 @@ changeset_blacklist = [
     'fd6ce0200a7f519380e6863930e92f9182030fa0',
     # jdk7u11-dev/jdk/test/closed redone rmi fix
     '770d9cf0e1dc97f7aaa3fdfbb430b27a40b1a3a9',
+    # jdk7u13-dev/jdk bad fix for 8006611
+    '12b6a43f9fefa6c3bbf81d9096e764e72bacf065',
     ]
 
 # Path to file containing additional blacklisted changesets
