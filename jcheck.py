@@ -306,6 +306,8 @@ changeset_blacklist = [
     '12b6a43f9fefa6c3bbf81d9096e764e72bacf065',
     # jdk8/nashorn unwanted tag jdk8-b78
     '8f49d8121c7e63d22f55412df4ff4800599686d6',
+    # hsx/hotspot-emb/hotspot wrong bugid 8009004
+    '29ab68ef5bb643f96218126dc2ff845561d552a4',
     ]
 
 # Path to file containing additional blacklisted changesets
