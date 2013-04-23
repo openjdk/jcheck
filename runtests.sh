@@ -236,8 +236,10 @@ jcheck = $(pwd)/jcheck.py
 [hooks]
 pretxncommit.jcheck=python:jcheck.hook
 ___
-HGUSER=$setup_author hg ci -R z -m '1111111: Foo!' -d '0 0'
-if HGUSER=$setup_author $HG tag -R z -r tip hsparent; then true; else fail; fi
+if HGUSER=$setup_author hg ci -R z -m '1111111: Foo!
+Reviewed-by: duke' -d '0 0' \
+   && HGUSER=$setup_author $HG tag -R z -r tip hsparent
+then true; else fail; fi
 r=$(expr $r + 1)
 
 echo "-- $r tags=lax comment check"
