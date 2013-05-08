@@ -220,6 +220,67 @@ hg add -R z z/.jcheck/conf
 if HGUSER=$setup_author hg ci -R z -m '1234: Silly bugid'; then true; else fail; fi
 r=$(expr $r + 1)
 
+# Ignore bugids
+echo "-- $r ignore bug ids 1"
+rm -rf z
+hg init z
+cat >z/.hg/hgrc <<___
+[extensions]
+jcheck = $(pwd)/jcheck.py
+[hooks]
+pretxncommit.jcheck=python:jcheck.hook
+___
+mkdir z/.jcheck
+cat >z/.jcheck/conf <<___
+project=jdk7
+bugids=ignore
+___
+hg add -R z z/.jcheck/conf
+
+if HGUSER=$setup_author hg ci -R z -m "OPENJDK6-1: test separate bugids
+Reviewed-by: $pass_author"; then true; else fail; fi
+r=$(expr $r + 1)
+
+echo "-- $r ignore bug ids 2"
+rm -rf z
+hg init z
+cat >z/.hg/hgrc <<___
+[extensions]
+jcheck = $(pwd)/jcheck.py
+[hooks]
+pretxncommit.jcheck=python:jcheck.hook
+___
+mkdir z/.jcheck
+cat >z/.jcheck/conf <<___
+project=jdk7
+bugids=ignore
+___
+hg add -R z z/.jcheck/conf
+
+if HGUSER=$setup_author hg ci -R z -m "openjdk6-2: test separate bugids
+Reviewed-by: $pass_author"; then fail; else true; fi
+r=$(expr $r + 1)
+
+echo "-- $r ignore bug ids 3"
+rm -rf z
+hg init z
+cat >z/.hg/hgrc <<___
+[extensions]
+jcheck = $(pwd)/jcheck.py
+[hooks]
+pretxncommit.jcheck=python:jcheck.hook
+___
+mkdir z/.jcheck
+cat >z/.jcheck/conf <<___
+project=jdk7
+bugids=ignore
+___
+hg add -R z z/.jcheck/conf
+
+if HGUSER=$setup_author hg ci -R z -m "6-2: test separate bugids
+Reviewed-by: $pass_author"; then fail; else true; fi
+r=$(expr $r + 1)
+
 # tags=lax tests
 echo "-- $r tags=lax tag check"
 rm -rf z

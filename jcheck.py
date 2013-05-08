@@ -140,7 +140,7 @@ base_addr_pat = "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
 addr_pat = ("(" + base_addr_pat + ")"
             + "|(([-_a-zA-Z0-9][-_ a-zA-Z0-9]+) +<" + base_addr_pat + ">)")
 
-bug_ident = re.compile("([0-9]+):")
+bug_ident = re.compile("(([A-Z][A-Z0-9]+-)?[0-9]+):")
 bug_check = re.compile("([0-9]{7}): \S.*$")
 sum_ident = re.compile("Summary:")
 sum_check = re.compile("Summary: \S.*")
@@ -318,14 +318,14 @@ blacklist_file = '/oj/db/hg/blacklist'
 
 class checker(object):
 
-    def __init__(self, ui, repo, repo_bugids, strict, lax):
+    def __init__(self, ui, repo, strict, lax):
         self.ui = ui
         self.repo = repo
         self.rv = Pass
         self.checks = [c for c in checker.__dict__ if c.startswith("c_")]
         self.checks.sort()
         self.summarized = False
-        self.repo_bugids = repo_bugids
+        self.repo_bugids = [ ]
         self.cs_bugids = [ ]            # Bugids in current changeset
         self.cs_author = None           # Author of current changeset
         self.cs_reviewers = [ ]         # Reviewers of current changeset
@@ -345,6 +345,12 @@ class checker(object):
         self.bugids_lax = lax and not strict
         if self.conf.get("bugids") == "lax":
             self.bugids_lax = True
+        self.bugids_ignore = False
+        if self.conf.get("bugids") == "ignore":
+            self.bugids_ignore = True
+        if not self.bugids_ignore:
+            # only identify bug ids if we are going to use them
+            self.repo_bugids = repo_bugids(ui, repo)
         self.blacklist = dict.fromkeys(changeset_blacklist)
         self.read_blacklist(blacklist_file)
         # hg < 1.0 does not have localrepo.tagtype()
@@ -426,10 +432,11 @@ class checker(object):
             while (st.ident_pattern.match(ln)):
                 m = st.check_pattern.match(ln)
                 if not m:
-                    if not (st.name == "bugid line" and self.bugids_lax):
+                    if not (st.name == "bugid line" and (self.bugids_lax or self.bugids_ignore)):
                         self.error(ctx, "Invalid %s" % st.name)
                 elif st.validator:
-                    st.validator(self, ctx, m, self.conf["project"])
+                    if not (st.name == "bugid line" and self.bugids_ignore):
+                        st.validator(self, ctx, m, self.conf["project"])
                 n = n + 1
                 i = i + 1
                 if i >= len(lns):
@@ -541,7 +548,7 @@ def hook(ui, repo, hooktype, node=None, source=None, **opts):
     lax = opts.has_key("lax") and opts["lax"]
     if strict:
         lax = False
-    ch = checker(ui, repo, repo_bugids(ui, repo), strict, lax)
+    ch = checker(ui, repo, strict, lax)
     ch.check_repo()
     firstnode = bin(node)
     start = repo.changelog.rev(firstnode)
@@ -576,7 +583,7 @@ def jcheck(ui, repo, **opts):
     lax = opts.has_key("lax") and opts["lax"]
     if strict:
         lax = False
-    ch = checker(ui, repo, repo_bugids(ui, repo), strict, lax)
+    ch = checker(ui, repo, strict, lax)
     ch.check_repo()
 
     try:
