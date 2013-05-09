@@ -277,6 +277,9 @@ bugids=ignore
 ___
 hg add -R z z/.jcheck/conf
 
+if HGUSER=$setup_author hg ci -R z -m "6-2: test separate bugids
+Reviewed-by: $pass_author"; then fail; else true; fi
+
 echo "-- $r ignore bug ids 4"
 rm -rf z
 hg init z
