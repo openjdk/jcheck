@@ -204,7 +204,7 @@ def repo_bugids(ui, repo):
     def addbugids(bugids, ctx):
         lns = ctx.description().splitlines()
         for ln in lns:
-            m = bug_ident.match(ln)
+            m = bug_check.match(ln)
             if m:
                 b = int(m.group(1))
                 if not b in bugids:

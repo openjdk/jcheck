@@ -277,8 +277,26 @@ bugids=ignore
 ___
 hg add -R z z/.jcheck/conf
 
-if HGUSER=$setup_author hg ci -R z -m "6-2: test separate bugids
-Reviewed-by: $pass_author"; then fail; else true; fi
+echo "-- $r ignore bug ids 4"
+rm -rf z
+hg init z
+cat >z/.hg/hgrc <<___
+[extensions]
+jcheck = $(pwd)/jcheck.py
+[hooks]
+pretxncommit.jcheck=python:jcheck.hook
+___
+mkdir z/.jcheck
+cat >z/.jcheck/conf <<___
+project=jdk7
+bugids=dup
+___
+hg add -R z z/.jcheck/conf
+
+if HGUSER=$setup_author hg ci -R z -m "OPENJDK-42: Don't collect non-numeric bugids
+Reviewed-by: $pass_author" >z/log 2>&1; then fail; else
+  if grep 'ValueError' z/log; then fail; fi
+fi
 r=$(expr $r + 1)
 
 # tags=lax tests
