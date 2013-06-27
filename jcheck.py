@@ -308,6 +308,10 @@ changeset_blacklist = [
     '8f49d8121c7e63d22f55412df4ff4800599686d6',
     # hsx/hotspot-emb/hotspot wrong bugid 8009004
     '29ab68ef5bb643f96218126dc2ff845561d552a4',
+    # jdk7u40/jdk/src/closed mistaken push 8016315
+    'd2b0a0c38c808bddff604a025469c5102a62edfe',
+    # jdk7u40/jdk/test/closed mistaken push 8016622
+    'd1e0d129aa0fccdc1ff1bcf20f126ffea900f30b',
     ]
 
 # Path to file containing additional blacklisted changesets
