@@ -252,7 +252,8 @@ changeset_whitelist = [
     'd77434402021cebc4c25b452db18bbfd2d7ccda1', # jdk6/jdk6/jdk  bad comment
     '931e5f39e365a0d550d79148ff87a7f9e864d2e1', # hotspot dup bug id 7147064
     'd8abc90163a4b58db407a60cba331ab21c9977e7', # hotspot dup bug id 7147064
-    '45849c62c298aa8426c9e67599e4e35793d8db13'  # pubs executable files
+    '45849c62c298aa8426c9e67599e4e35793d8db13', # pubs executable files
+    '38050e6655d8acc220800a28128cef328906e825', # pubs invalid bugid line
     ]
 
 # Bad changesets that should never be allowed in
