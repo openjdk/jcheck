@@ -313,6 +313,8 @@ changeset_blacklist = [
     'd2b0a0c38c808bddff604a025469c5102a62edfe',
     # jdk7u40/jdk/test/closed mistaken push 8016622
     'd1e0d129aa0fccdc1ff1bcf20f126ffea900f30b',
+    # hsx/hotspot-gc/hotspot wrong bugid 8024547
+    '9561e0a8a2d63c45e751755d791e25396d94025a',
     ]
 
 # Path to file containing additional blacklisted changesets
