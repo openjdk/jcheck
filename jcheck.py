@@ -315,6 +315,8 @@ changeset_blacklist = [
     'd1e0d129aa0fccdc1ff1bcf20f126ffea900f30b',
     # hsx/hotspot-gc/hotspot wrong bugid 8024547
     '9561e0a8a2d63c45e751755d791e25396d94025a',
+    # jdk8/ds/install dup bugid 8024771
+    '835ef04a36e5fe95d4c0deb6e633371053f3cbba',
     ]
 
 # Path to file containing additional blacklisted changesets
