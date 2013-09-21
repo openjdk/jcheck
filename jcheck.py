@@ -317,6 +317,12 @@ changeset_blacklist = [
     '9561e0a8a2d63c45e751755d791e25396d94025a',
     # jdk8/ds/install dup bugid 8024771
     '835ef04a36e5fe95d4c0deb6e633371053f3cbba',
+    # jdk5u/jdk5.0u55/j2se bad fix 8025034
+    'e18574aa4be397b83a43e1444cb96c903f152fcb',
+    # jdk6u/jdk6u65/j2se bad fix 8025034
+    'a0f1589decc6181a5e048e48058d12cfa68cd3e1',
+    # jdk7u/jdk7u45/j2se bad fix 8025034
+    '0a312c04dbc8d33601efecfb0d23b8c09bf088fe',
     ]
 
 # Path to file containing additional blacklisted changesets
