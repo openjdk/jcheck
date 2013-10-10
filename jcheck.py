@@ -438,9 +438,12 @@ class checker(object):
             lns = filter(checked_comment_line, lns)
 
         i = 0                           # Input index
-        gi = 0                          # Grammar index
+        gi = -1                         # Grammar index
         n = 0                           # Occurrence count
         while i < len(lns):
+            gi = gi + 1
+            if gi >= len(comment_grammar):
+                break
             ln = lns[i]
             st = comment_grammar[gi]
             n = 0
@@ -461,9 +464,6 @@ class checker(object):
                 self.error(ctx, "Incomplete comment: Missing %s" % st.name)
             if n > st.max:
                 self.error(ctx, "Too many %ss" % st.name)
-            gi = gi + 1
-            if gi >= len(comment_grammar):
-                break
 
         if not self.cs_contributor and [self.cs_author] == self.cs_reviewers:
             self.error(ctx, "Self-reviews not permitted")

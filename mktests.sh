@@ -143,6 +143,9 @@ Reviewed-by: duke"
 fail ci -m "$(bugid): A random bug"
 
 fail ci -m "$(bugid): A random bug
+Summary: Summary line with no Reviewed-by line"
+
+fail ci -m "$(bugid): A random bug
 Reviewed-by:"
 
 fail ci -m "$(bugid): A random bug
