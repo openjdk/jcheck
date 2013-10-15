@@ -254,6 +254,8 @@ changeset_whitelist = [
     'd8abc90163a4b58db407a60cba331ab21c9977e7', # hotspot dup bug id 7147064
     '45849c62c298aa8426c9e67599e4e35793d8db13', # pubs executable files
     '38050e6655d8acc220800a28128cef328906e825', # pubs invalid bugid line
+    # hotspot/test/closed no Reviewed-by line
+    '8407fef5685f32ed42b79c5d5f13f6c8007171ac',
     ]
 
 # Bad changesets that should never be allowed in
