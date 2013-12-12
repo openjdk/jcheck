@@ -325,6 +325,8 @@ changeset_blacklist = [
     'a0f1589decc6181a5e048e48058d12cfa68cd3e1',
     # jdk7u/jdk7u45/j2se bad fix 8025034
     '0a312c04dbc8d33601efecfb0d23b8c09bf088fe',
+    # jdk8/build/pubs executable files
+    '3ecd3336c805978a37a933fbeca26c65fbe81432',
     ]
 
 # Path to file containing additional blacklisted changesets
