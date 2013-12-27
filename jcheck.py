@@ -327,6 +327,8 @@ changeset_blacklist = [
     '0a312c04dbc8d33601efecfb0d23b8c09bf088fe',
     # jdk8/build/pubs executable files
     '3ecd3336c805978a37a933fbeca26c65fbe81432',
+    # hsx/jdk7u/hotspot wrong bugid
+    'f5d8e6d72e23d972db522f7ad4cd3b9b01085466',
     ]
 
 # Path to file containing additional blacklisted changesets
