@@ -69,6 +69,23 @@ if not _matchall:
         _matchall = scmutil.matchall
     except ImportError:
         pass
+
+def repocompat(repo):
+    # Modern mercurial versions use len(repo) and repo[cset_id]; enable those
+    # operations with older versions.
+    t = type(repo)
+    if not getattr(t, '__len__', None):
+        def repolen(self):
+            return self.changelog.count()
+        setattr(t, '__len__', repolen)
+    if not getattr(t, '__getitem__', None):
+        def repoitem(self, arg):
+            return context.changectx(self, arg)
+        setattr(t, '__getitem__', repoitem)
+    # Similarly, use branchmap instead of branchtags; enable it if needed.
+    if not getattr(t, 'branchmap', None):
+        setattr(t, 'branchmap', t.branchtags)
+
 
 # Configuration-file parsing
 
@@ -540,7 +557,7 @@ class checker(object):
                     self.error(None,
                                "Illegal tag name: %s" % t)
 
-        bs = self.repo.branchtags()
+        bs = self.repo.branchmap()
         if len(bs) > 1:
             bs = bs.copy()
             del bs["default"]
@@ -560,6 +577,7 @@ class checker(object):
 
 def hook(ui, repo, hooktype, node=None, source=None, **opts):
     ui.debug("jcheck: node %s, source %s, args %s\n" % (node, source, opts))
+    repocompat(repo)
     if not repo.local():
         raise util.Abort("repository '%s' is not local" % repo.path)
     if not os.path.exists(os.path.join(repo.root, ".jcheck")):
@@ -592,6 +610,7 @@ def strict_hook(ui, repo, hooktype, node=None, source=None, **opts):
 def jcheck(ui, repo, **opts):
     """check changesets against JDK standards"""
     ui.debug("jcheck repo=%s opts=%s\n" % (repo.path, opts))
+    repocompat(repo)
     if not repo.local():
         raise util.Abort("repository '%s' is not local" % repo.path)
     if not os.path.exists(os.path.join(repo.root, ".jcheck")):
