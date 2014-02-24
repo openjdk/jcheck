@@ -350,6 +350,8 @@ changeset_blacklist = [
     'da4b0962ad1161dbd84e7daa0fdc706281c456a2',
     # jdk8/tl/jdk/test/closed erroneous push 7152892
     '1e69a1ce212c7c4c884f155dd123c936787db273',
+    # jdk9/jdk9/closed bad tag
+    '61fdebb503d79392536b8f502ae215022d1a1f1c',
     ]
 
 # Path to file containing additional blacklisted changesets
