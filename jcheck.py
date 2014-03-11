@@ -658,6 +658,13 @@ def jcheck(ui, repo, **opts):
         ui.status("\n")
     return ch.rv
 
+# This is invoked on servers to check pushkeys; it's not needed on clients.
+def prepushkey(ui, repo, hooktype, namespace, key, old=None, new=None, **opts):
+    if namespace == 'phases':
+        return Pass
+    ui.write_err('ERROR:  pushing keys (%s) is disabled\n' % namespace)
+    return Fail
+
 opts = [("", "lax", False, "Check comments, tags and whitespace laxly"),
         ("r", "rev", [], "check the specified revision or range (default: tip)"),
         ("s", "strict", False, "check everything")]
