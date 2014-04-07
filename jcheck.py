@@ -352,6 +352,10 @@ changeset_blacklist = [
     '1e69a1ce212c7c4c884f155dd123c936787db273',
     # jdk9/jdk9/closed bad tag
     '61fdebb503d79392536b8f502ae215022d1a1f1c',
+    # jdk9/hs-rt/jdk/src/closed dup bugid 8034951
+    'a19596796430761dde87bee9f6616480f1c93678',
+    # jdk9/hs-rt/jdk/test/closed dup bugid 8034951
+    'd2308c9714c94e87a0e60cda314746a5c17dbcc2',
     ]
 
 # Path to file containing additional blacklisted changesets
