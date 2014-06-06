@@ -356,6 +356,8 @@ changeset_blacklist = [
     'a19596796430761dde87bee9f6616480f1c93678',
     # jdk9/hs-rt/jdk/test/closed dup bugid 8034951
     'd2308c9714c94e87a0e60cda314746a5c17dbcc2',
+    # jdk9/client/deploy erroneous push 8041798
+    'fff4ff4fd6f031ab335b44842d69fd125297b5ab',
     ]
 
 # Path to file containing additional blacklisted changesets
