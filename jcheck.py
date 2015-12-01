@@ -144,7 +144,7 @@ badwhite_re = re.compile("(\t)|([ \t]$)|\r", re.MULTILINE)
 normext_re = re.compile(".*\.(java|c|h|cpp|hpp)$")
 
 tag_desc_re = re.compile("Added tag [^ ]+ for changeset [0-9a-f]{12}")
-tag_re = re.compile("tip$|jdk[4-9](u\d{1,3})?-b\d{2,3}$|hs\d\d(\.\d{1,2})?-b\d\d$")
+tag_re = re.compile("tip$|jdk-([1-9]([0-9]*)(\.[0-9]){0,3})\+([0-9]+)$|jdk[4-9](u\d{1,3})?-b\d{2,3}$|hs\d\d(\.\d{1,2})?-b\d\d$")
 
 def badwhite_what(m):
     if m.group(1):
