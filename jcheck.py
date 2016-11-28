@@ -273,6 +273,7 @@ changeset_whitelist = [
     '38050e6655d8acc220800a28128cef328906e825', # pubs invalid bugid line
     # hotspot/test/closed no Reviewed-by line
     '8407fef5685f32ed42b79c5d5f13f6c8007171ac',
+    'c667bae72ea8530ef1e055dc25951b991dfd5888', # hotspot dup bug id 8169597
     ]
 
 # Bad changesets that should never be allowed in
