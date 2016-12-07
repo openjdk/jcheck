@@ -267,13 +267,18 @@ changeset_whitelist = [
     'a25f15bfd04b46a302b6ca1a298c176344f432dd', # jdk6/jdk6/jdk  bad comment
     'bf87d5af43614d609a5251c43eea44c028500d02', # jdk6/jdk6/jdk  bad comment
     'd77434402021cebc4c25b452db18bbfd2d7ccda1', # jdk6/jdk6/jdk  bad comment
-    '931e5f39e365a0d550d79148ff87a7f9e864d2e1', # hotspot dup bug id 7147064
-    'd8abc90163a4b58db407a60cba331ab21c9977e7', # hotspot dup bug id 7147064
+    '931e5f39e365a0d550d79148ff87a7f9e864d2e1', # hotspot dup bugid 7147064
+    'd8abc90163a4b58db407a60cba331ab21c9977e7', # hotspot dup bugid 7147064
     '45849c62c298aa8426c9e67599e4e35793d8db13', # pubs executable files
     '38050e6655d8acc220800a28128cef328906e825', # pubs invalid bugid line
     # hotspot/test/closed no Reviewed-by line
     '8407fef5685f32ed42b79c5d5f13f6c8007171ac',
-    'c667bae72ea8530ef1e055dc25951b991dfd5888', # hotspot dup bug id 8169597
+    'c667bae72ea8530ef1e055dc25951b991dfd5888', # hotspot dup bugid 8169597 (hs)
+    '5a574ef5a4eec3ec3be9352aae3b383202c9a3a6', # hotspot dup bugid 8169597 (dev)
+    #
+    #   For duplicate bugids, add the
+    #   hashes of all related changesets!
+    #
     ]
 
 # Bad changesets that should never be allowed in
