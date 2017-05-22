@@ -275,6 +275,8 @@ changeset_whitelist = [
     '8407fef5685f32ed42b79c5d5f13f6c8007171ac',
     'c667bae72ea8530ef1e055dc25951b991dfd5888', # hotspot dup bugid 8169597 (hs)
     '5a574ef5a4eec3ec3be9352aae3b383202c9a3a6', # hotspot dup bugid 8169597 (dev)
+    '38a240fd58a287acb1963920b92ed4d9c2fd39e3', # hotspot dup bugid 8179954 (jdk10)
+    'fc8c54b03f821dbc7385ab6b08cb91cc7a3bf3cb', # hotspot dup bugid 8179954 (hs)
     #
     #   For duplicate bugids, add the
     #   hashes of all related changesets!
