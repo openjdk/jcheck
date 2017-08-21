@@ -1,21 +1,21 @@
 #
-# Copyright (c) 2007, 2012, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2007, 2017, Oracle and/or its affiliates. All rights reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
-# 
+#
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
 # published by the Free Software Foundation.
-# 
+#
 # This code is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # version 2 for more details (a copy is included in the LICENSE file that
 # accompanied this code).
-# 
+#
 # You should have received a copy of the GNU General Public License version
 # 2 along with this work; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
-# 
+#
 # Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
 # or visit www.oracle.com if you need additional information or have any
 # questions.
@@ -53,7 +53,7 @@ Fail = True
 def datestr(ctx):
     # Mercurial 0.9.5 and earlier append a time zone; strip it.
     return util.datestr(ctx.date(), format="%Y-%m-%d %H:%M")[:16]
-    
+
 def oneline(ctx):
     return ("%5d:%s  %-12s  %s  %s\n"
             % (ctx.rev(), short(ctx.node()), ctx.user(), datestr(ctx),
@@ -226,7 +226,7 @@ def repo_bugids(ui, repo):
                 b = int(m.group(1))
                 if not b in bugids:
                     bugids[b] = ctx.rev()
-        
+
     # Should cache this, eventually
     bugids = { }                        # bugid -> rev
     opts = { 'rev' : ['0:tip'] }
@@ -626,7 +626,26 @@ def strict_hook(ui, repo, hooktype, node=None, source=None, **opts):
     opts["strict"] = True
     return hook(ui, repo, hooktype, node, source, **opts)
 
+# From Mercurial 1.9, the preferred way to define commands is using the @command
+# decorator. If this isn't available, fallback on a simple local implementation
+# that just adds the data to the cmdtable.
+cmdtable = {}
+if hasattr(cmdutil, 'command'):
+    command = cmdutil.command(cmdtable)
+else:
+    def command(name, options, synopsis):
+        def decorator(func):
+            cmdtable[name] = func, list(options), synopsis
+            return func
+        return decorator
 
+opts = [("", "lax", False, "Check comments, tags and whitespace laxly"),
+        ("r", "rev", [], "check the specified revision or range (default: tip)"),
+        ("s", "strict", False, "check everything")]
+
+help = "[-r rev] [-s]"
+
+@command("jcheck", opts, "hg jcheck " + help)
 def jcheck(ui, repo, **opts):
     """check changesets against JDK standards"""
     ui.debug("jcheck repo=%s opts=%s\n" % (repo.path, opts))
@@ -678,13 +697,3 @@ def prepushkey(ui, repo, hooktype, namespace, key, old=None, new=None, **opts):
         return Pass
     ui.write_err('ERROR:  pushing keys (%s) is disabled\n' % namespace)
     return Fail
-
-opts = [("", "lax", False, "Check comments, tags and whitespace laxly"),
-        ("r", "rev", [], "check the specified revision or range (default: tip)"),
-        ("s", "strict", False, "check everything")]
-
-help = "[-r rev] [-s]"
-
-cmdtable = {
-    "jcheck": (jcheck, opts, "hg jcheck " + help)
-}
