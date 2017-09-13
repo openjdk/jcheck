@@ -244,8 +244,6 @@ def repo_bugids(ui, repo):
             if st == 'add':
                 node = repo.changelog.node(rev)
                 addbugids(bugids, context.changectx(repo, node))
-    if ui.debugflag:
-        ui.debug("Bugids: %s\n" % bugids)
     return bugids
 
 
@@ -257,6 +255,7 @@ def repo_bugids(ui, repo):
 # so that jcheck may evolve
 #
 changeset_whitelist = [
+
     '31000d79ec713de1e601dc16d74d726edd661ed5',
     'b7987d19f5122a9f169e568f935b7cdf1a2609f5',
     'c70a245cad3ad74602aa26b9d8e3d0472f7317c3',
@@ -277,10 +276,94 @@ changeset_whitelist = [
     '5a574ef5a4eec3ec3be9352aae3b383202c9a3a6', # hotspot dup bugid 8169597 (dev)
     '38a240fd58a287acb1963920b92ed4d9c2fd39e3', # hotspot dup bugid 8179954 (jdk10)
     'fc8c54b03f821dbc7385ab6b08cb91cc7a3bf3cb', # hotspot dup bugid 8179954 (hs)
-    #
-    #   For duplicate bugids, add the
-    #   hashes of all related changesets!
-    #
+    # For duplicate bugids, add the hashes of all related changesets!
+
+    # consolidated/open
+    '489c9b5090e2bdfe3a2f196afe013025e7443f6b',
+    '90ce3da70b431eab8f123abd25ceda9e53a094a9',
+    '02bb8761fcce2922d1619062a303dbce266068a9',
+    '01d07c8452ff8e96f3ff777f0b50e1c98774b9df',
+    '7f561c08de6b09951cf79975dba08150982c7bb3',
+    'af5240695a6de2c89f01e6de58e9bad6f582c9ff',
+    '474761f14bcad3a18b5e6990447402c3a24d5fea',
+    'aa192ed8538b76aa647e9cdd89e485b5f10e0a26',
+    '06bc494ca11ef44070b1ea054c34c3655c93ddb2',
+    '1cc8dd79fd1cd13d36b385196271a29632c67c3b',
+    '408b55da75b0ae21ce9f6f27a798d051d4675e4e',
+    '74fe6922716dbd4e10b5d5efbf23af551b84a697',
+    '51a7bc3e93a011c733f83ab871612ccdc6216a75',
+    '5b0720709093938bc2e0d6e4522059d893462738',
+    '05173e59b8785ba423d0a582d06957596dce193d',
+    '80e13954d5b063a2275778e96e639b4282861610',
+    '4e9d88727ae307a6430931dad8e569bc0bf465c4',
+    'e14008f86acd1d3860aa4cce7d5fe62c70529d48',
+    'abae672ab077e142e228067a63490868da536c60',
+    '898f519b613889dbce3c16c2baf482d1f4243f8e',
+    '7e19cecfbfc8bf88b52fc88758817f780bf188a1',
+    '3b2c9223cdf512ba11c7db61f196a187d82d0036',
+    '370f960bd6dbf4cd670625eab08364a190f9afc3',
+    '564d8dc66b61329bbe2576a93b68d41d3ccdba00',
+    '249e283e044665a83dbce8e75a97bf63f83cb102',
+    '3d179532574942423bcb9fbdf4c7afe003ccceeb',
+    '71e33d83609b052fc9490b1822829ca692662d71',
+    '862a85ed20dbdf0efc1539cc83aff7dff60194ef',
+    '14672d061f7a42801f3feab49228f36272ded78a',
+    '0d803d2ebd6b4544145331fb7f2e4c0eb0f0ad64',
+    '59439733e87a34e9b41bd003c3ab7580112fc4f3',
+    'e12adc424b4309163099c518e771c7eb159f94a4',
+    '11c76613f3a2143d253fb3c389119f41188d709d',
+    'bbe9212c700515be4c8c5dff0354104386810e8c',
+    'f0e156a39c75441522f05bc7abc2675a37ea0b1c',
+    'd1f02d5e4c740acc0b2b5651126f38090a556171',
+    '7b3eaf04308f28aac3d21e05e8487df9d29719a4',
+    '011727a60840e202a9c556d840636e3907fd0ce1',
+    '425e2c6b5941e31797c6feca184ecfbd7c1c077b',
+    '0f8aea9a422ed9a888623e0f918cfc71be8a5a24',
+    'a8ab83cbaa49a9232ed8153d731bc9e328f6ee61',
+
+    # consolidated/closed
+    'e7e6bffe1f8028ba4daf575385dc4fd578034d2f',
+    '2523cc85defa8d570b0b211c38f2b08fc457eb6c',
+    '47c62354c6da8cd5022d92babafc269878a9340f',
+    '01a573cdd8d0a26a851dffdf126f96fbd829ac6e',
+    '26373189d6f8f9f6eed4d9a6ac2345cc75388a80',
+    'ca94fe25e6a503e9641c482b5d76c4d55b0ac297',
+    'a89ff61916e503648783883124f60a459e25df1f',
+    'f41443d20e3bdca9a16b94a7a464cb7ac9b2ca73',
+    '0e2c107c7319e4bbdc8ee80c4dba3d87329ee19f',
+    '06905d1339554298cecfa9d599e6fbaefbcd8df7',
+    '324534d86a9cad44404dcfcff5e45a21d91eb445',
+    'd4c8044fa522ae5e89215324f7035e0ec9f8df55',
+    '76ec26e0c56712624e6a5809929571a5bd028576',
+    '38557f4c06fdc2209ede8044dd7bd6893ea365f4',
+    '015b1a27f5352eb24ad975b1a9f45a1d62d4e977',
+    'dfae63c29a6cc3254097065c629d85dac5d10c81',
+    '87a0ce109f0f1de36e4520cfd020926b2b4a2cbc',
+    '5bc60aea1e1634843c79f5426d8f682a37e2092f',
+    '199381c054109f57ffcd2291fa343c528b53b6d9',
+    '22f717ecdcce500190b685763bcddc68d55d3316',
+    'ece95c3640926c371c885358ab6b54e18579e3e2',
+    '2c88ed83131005533c9a43d5da1f5fd7ff5675d8',
+    '38835cfd0829bd91cfbe5a94ff761c92004cdd07',
+    '3782924e5ad1e331fa221a4f37d2cabe9b3734fb',
+    '70ff4a44bcf94be3b4bdfb9189e70e2d08aaf8c0',
+    'd999bdc2f2bea8761b6b430115e84c18d4fcf6a4',
+    '2d8b9e27c05ed338badf0bb82b1f22fa13c0a2d2',
+    '667bbf13b1bf6b50074fa80240cea77c2c0b21ba',
+    '94deb45ef34f9dab46d8401d51ce446d072f4917',
+    '58e382f36a016ed31b71544256139fdd10a405c3',
+    'd5b7c3f4f5220ae0e927501ae53e43652668b5ae',
+    '443167e10bc4eed20301adef5121af9394e844e3',
+    '8b1f7ef1cd682b16d5f41b34c5d474adf2cf11ab',
+    '9fd855244664fa1ba553bc823a6e8fed1183ad32',
+    '5e64c143b0c6163ac815ea159fa8c11b57ccc445',
+    '6a8e2a080676822e67f9b0d51943c8110ec861b0',
+    '4ce78429449f8100ccb289b51d63b055cec37223',
+    'e46a0e002a57095855bb632edb447597cf6cecf7',
+    '7cb53066e470c26002191263a664350034d49bff',
+    '840eac30564f5304dbaaec276a2dabf353c7f623',
+    'fd67174f8a7708238c84896603a960ea9b5e3cca',
+
     ]
 
 # Bad changesets that should never be allowed in
