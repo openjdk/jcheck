@@ -535,10 +535,11 @@ class checker(object):
             fx = ctx.filectx(f)
             if normext_re.match(f) and not self.whitespace_lax:
                 data = fx.data()
-                m = badwhite_re.search(data)
-                if m:
-                    ln = data.count("\n", 0, m.start()) + 1
-                    self.error(ctx, "%s:%d: %s" % (f, ln, badwhite_what(m)))
+                if "\t" in data or "\r" in data or " \n" in data:
+                    m = badwhite_re.search(data)
+                    if m:
+                        ln = data.count("\n", 0, m.start()) + 1
+                        self.error(ctx, "%s:%d: %s" % (f, ln, badwhite_what(m)))
             ## check_file_header(self, fx, data)
             flags = fx.manifest().flags(f)
             if 'x' in flags:
