@@ -605,7 +605,7 @@ class checker(object):
         changes = self.repo.status(ctx.parents()[0].node(),
                                    ctx.node(), None)[:5]
         modified, added = changes[:2]
-        ## Skip files that were renamed but not modified
+        # ## Skip files that were renamed but not modified
         files = modified + added
         if self.ui.debugflag:
             self.ui.debug("Checking files: %s\n" % ", ".join(files))
@@ -643,7 +643,7 @@ class checker(object):
         self.cs_contributor = None
         ctx = context.changectx(self.repo, node)
         self.ui.note(oneline(ctx))
-        if not self.strict and hex(node) in changeset_whitelist:
+        if hex(node) in changeset_whitelist:
             self.ui.note("%s in whitelist; skipping\n" % hex(node))
             return Pass
         for c in self.checks:
