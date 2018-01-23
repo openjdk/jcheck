@@ -451,6 +451,8 @@ changeset_blacklist = [
     'fff4ff4fd6f031ab335b44842d69fd125297b5ab',
     # jdk/jdk10 (closed) erroneous restoration of tests 8194908
     '050a07d47f72c341bb6cb47a85ea729791c9f350',
+    # jdk-updates/jdk10u-cpu (closed) erroneous restoration of tests 8194916
+    '92419449b854803e7b5f3f4b89dfcf6fd564aeef',
     ]
 
 # Path to file containing additional blacklisted changesets
