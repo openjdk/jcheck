@@ -449,6 +449,8 @@ changeset_blacklist = [
     'd2308c9714c94e87a0e60cda314746a5c17dbcc2',
     # jdk9/client/deploy erroneous push 8041798
     'fff4ff4fd6f031ab335b44842d69fd125297b5ab',
+    # jdk/jdk10 (closed) erroneous restoration of tests 8194908
+    '050a07d47f72c341bb6cb47a85ea729791c9f350',
     ]
 
 # Path to file containing additional blacklisted changesets
