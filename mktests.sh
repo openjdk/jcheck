@@ -1,6 +1,7 @@
 #! /bin/bash
 
 export HGRCPATH=
+hg version | head -1
 
 # No insult intended here -- we just need valid author names for the tests
 pass_author=ohair
