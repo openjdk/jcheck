@@ -21,9 +21,9 @@ tests: jcheck.py.pub mktests.sh ; sh mktests.sh
 # for easy access
 #
 dist: jcheck.py.pub
-	@if [ "$$(hg st -m)" ]; then echo "Pending changes"; exit 1; fi
+	@if [ "$$(HGRCPATH= hg st -m)" ]; then echo "Pending changes"; exit 1; fi
 	cp -p $< dist/jcheck.py
-	(cd dist; \
+	(cd dist; export HGRCPATH=; \
 	 hg cat jcheck.py >/dev/null 2>&1 || hg add jcheck.py; \
 	 hg ci -m "jcheck $(VERSION) $(DATE)" -d "$(DATE)" \
 	 && hg tip)
