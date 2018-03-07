@@ -30,7 +30,7 @@ echo 'project=jdk7' >.jcheck/conf
 
 date >date
 HGUSER=$setup_author hg ci -Am '1000000: Init
-Reviewed-by: duke'
+Reviewed-by: alanb'
 
 echo 1000001 >.hg/bugid
 
@@ -47,7 +47,7 @@ runtest() {
   export HGUSER=$1; shift
   if [ -z "$*" ]; then
     msg="$(bugid): Bug
-Reviewed-by: duke"
+Reviewed-by: alanb"
     (set -x; hg ci -m "$msg")
   else
     (set -x; hg "$@")
@@ -65,20 +65,20 @@ setup() { runtest $setup_author "$@"; }
 # THESE MUST BE FIRST since they refer to specific revision indices
 
 setup ci -m "$(bugid): Bug to merge
-Reviewed-by: duke"
+Reviewed-by: alanb"
 hg bundle --base 0 -r 1 z
 hg rollback
 (datefile=date2 setup ci -m "$(bugid): Merge to bug
-Reviewed-by: duke")
+Reviewed-by: alanb")
 (export HGUSER=$fail_author; set -x; hg fetch z)
 rm z
 
 setup ci -m "$(bugid): Bug to merge
-Reviewed-by: duke"
+Reviewed-by: alanb"
 hg bundle --base 3 -r 4 z
 hg rollback
 (datefile=date3 setup ci -m "$(bugid): Merge to bug
-Reviewed-by: duke")
+Reviewed-by: alanb")
 (export HGUSER=$pass_author; set -x; hg fetch -m Merge z)
 rm z
 
@@ -118,28 +118,28 @@ fail
 fail ci -m "Blah blah"
 
 pass ci -m "$(bugid): A random bug
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): A random bug
- Reviewed-by: duke"
+ Reviewed-by: alanb"
 
 fail ci -m " $(bugid): A random bug
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid):  A random bug
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid):
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): A random bug
-Reviewed-by:  duke"
+Reviewed-by:  alanb"
 
-fail ci -m "Reviewed-by: duke"
+fail ci -m "Reviewed-by: alanb"
 
 fail ci -m "$(bugid): A random bug
 Blah blah
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): A random bug"
 
@@ -160,27 +160,27 @@ Reviewed-by: Ben Bitdiddle"
 
 pass ci -m "$(bugid): A random bug
 $(bugid): Another random bug
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "123456: A short bugid
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "nobugid: No bugid
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "0000000: Bad bugid
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 for i in 1 2 4 5 6 7 8
 do
     pass ci -m "${i}112222: bugid ${i}xxxxxx
-Reviewed-by: duke"
+Reviewed-by: alanb"
 done
 
 for i in 3 9
 do
     fail ci -m "${i}112222: bugid ${i}xxxxxx
-Reviewed-by: duke"
+Reviewed-by: alanb"
 done
 
 pass ci -m "$(bugid): The next bug
@@ -193,39 +193,39 @@ fail ci -m "$(bugid): Another bug
 Contributed-by: Ben Bitdiddle <ben@bits.org>"
 
 pass ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by: ben@bits.org"
 
 pass ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by: Ben Bitdiddle <ben@bits.org>"
 
 pass ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by: Ben Bitdiddle <ben@bits.org>, Alyssa P Hacker <alyssa@hacker.net>"
 
 pass ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by: ben@bits.org, Alyssa P Hacker <alyssa@hacker.net>"
 
 pass ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by: ben@bits.org, alyssa@hacker.net"
 
 fail ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by: ben@bits.org alyssa@hacker.net"
 
 fail ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by:  Ben Bitdiddle <ben@bits.org>"
 
 fail ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by: Ben Bitdiddle"
 
 fail ci -m "$(bugid): Another bug
-Reviewed-by: duke
+Reviewed-by: alanb
 Contributed-by: foo"
 
 fail ci -m "$(bugid): Another bug
@@ -234,46 +234,46 @@ Contributed-by: ben@bits.org"
 
 pass ci -m "$(bugid): Yet another bug
 Summary: Rewrite code
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): Yet another bug
 Summary: 
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): Yet another bug
 Summary:  Rewrite code
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): Yet another bug
  Summary: Rewrite code
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): Yet another bug
 Summary: Rewrite code
 
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "1000002: Duplicate bugid
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 b=$(bugid)
 fail ci -m "$b: Duplicate bugid in changeset
 $b: Duplicate bugid in changeset
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 # hg seems to strip trailing whitespace,
 # at least for comments given with -m
 pass ci -m "$(bugid): That's some bug 
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 pass ci -m "$(bugid): That's some bug
-Reviewed-by: duke "
+Reviewed-by: alanb "
 
 pass ci -m "$(bugid): That's some bug
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): That's some	bug
-Reviewed-by: duke"
+Reviewed-by: alanb"
 
 fail ci -m "$(bugid): Buggy bug bug bug
 Reviewed-by: fang"
@@ -290,6 +290,9 @@ Reviewed-by: $pass_author, $setup_author"
 pass ci -m "$(bugid): Self-review of a contribution
 Reviewed-by: $pass_author
 Contributed-by: ben@bits.org"
+
+fail ci -m "$(bugid): Reviewed by duke
+Reviewed-by: duke"
 
 
 # Lax changeset comments

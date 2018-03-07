@@ -78,7 +78,7 @@ n=$(hg id -n)
 date >>date.$n
 hg add date.$n
 HGUSER=$setup_author hg ci -m "$(bugid): Head one
-Reviewed-by: duke"
+Reviewed-by: alanb"
 rm -rf z
 hg bundle --base $n -r $(expr $n + 1) z
 hg rollback
@@ -86,7 +86,7 @@ hg revert date.$n
 date >>date.$n.2
 hg add date.$n.2
 HGUSER=$setup_author hg ci -m "$(bugid): Head two
-Reviewed-by: duke"
+Reviewed-by: alanb"
 HG='hg --config hooks.pretxnchangegroup.jcheck=python:jcheck.strict_hook'
 if HGUSER=$setup_author $HG pull z; then fail $r; fi
 hg revert date.$n.2
@@ -101,7 +101,7 @@ date >date.$r
 hg add date.$r
 HG='hg --config hooks.pretxncommit.jcheck=python:jcheck.hook'
 if HGUSER=$setup_author $HG ci -m "$(bugid): Branch
-Reviewed-by: duke" ; then fail $r; fi
+Reviewed-by: alanb" ; then fail $r; fi
 hg rollback; hg revert -a
 rm .hg/branch ## hg bug ?
 r=$(expr $r + 1)
@@ -154,8 +154,8 @@ done
 
 # Black/white lists
 
-blackhash=b5dd894e33c0dfa6cde0c5c5fd1f7a7e5edd6f01
-whitehash=1c3c89ae5adcd57d074a268c5328df476ccabf52
+blackhash=e8fdeed7604523b5460df91973d6133b1120b8f7
+whitehash=5a8ece55687803eb726738773a8b5ecc56998ee0
 rm -rf z
 hg init z
 mkdir z/.jcheck
@@ -170,8 +170,9 @@ echo "-- $r blacklist"
 echo foo >z/foo
 hg add -R z z/foo
 HGUSER=$setup_author hg ci -R z -m '1010101: Good but black
-Reviewed-by: duke' -d '0 0'
-if hg jcheck_test --black $blackhash -R z -r tip; then fail; fi
+Reviewed-by: alanb' -d '0 0'
+if hg jcheck_test --black $blackhash -R z -r tip; then
+  hg log -R z -r tip --template '{node}\n'; fail; fi
 r=$(expr $r + 1)
 
 echo "-- $r blacklist file 1"
@@ -195,7 +196,8 @@ r=$(expr $r + 1)
 echo "-- $r whitelist"
 echo foobar >z/foo
 HGUSER=$setup_author hg ci -R z -m '1010101: Bad but white' -d '0 0'
-if hg jcheck_test --white $whitehash -R z -r tip; then true; else fail; fi
+if hg jcheck_test --white $whitehash -R z -r tip; then true; else 
+  hg log -R z -r tip --template '{node}\n'; fail; fi
 r=$(expr $r + 1)
 
 # Duplicate bugids
@@ -330,7 +332,7 @@ jcheck = $(pwd)/jcheck.py
 pretxncommit.jcheck=python:jcheck.hook
 ___
 if HGUSER=$setup_author hg ci -R z -m '1111111: Foo!
-Reviewed-by: duke' -d '0 0' \
+Reviewed-by: alanb' -d '0 0' \
    && HGUSER=$setup_author $HG tag -R z -r tip hsparent
 then true; else fail; fi
 r=$(expr $r + 1)

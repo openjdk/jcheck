@@ -204,7 +204,7 @@ def bug_validate(ch, ctx, m, pn):
 def rev_validate(ch, ctx, m, pn):
     ans = re.split(", *", m.group(1))
     for an in ans:
-        if not validate_author(an, pn):
+        if not validate_author(an, pn) or an == "duke":
             ch.error(ctx, "Invalid reviewer name: %s" % an)
         ch.cs_reviewers.append(an)
 
@@ -384,6 +384,19 @@ changeset_whitelist = [
     '7cb53066e470c26002191263a664350034d49bff',
     '840eac30564f5304dbaaec276a2dabf353c7f623',
     'fd67174f8a7708238c84896603a960ea9b5e3cca',
+
+    # Reviewed-by: duke
+    '2ae445f57ac60fee1dcf4d518f605a71680261f9',
+    '4814eec6a323bbe72113878a8adf86ce1206abb8',
+    '17e70318af8bdcd89bc2d75829bc376061a9e24d',
+    '413576d00672c3725dd7517703b96804d4fdea97',
+    'd2a313368ccbaa1a3ce8276ead68461d08a7593e',
+    'e70067b81b0b05cda3f84be73426ff97a681641b',
+    '387a39577f09c87a06b502ccca9e608ea73ed4e4',
+    '96179f26139e78f90b1cd6c528013d4c496f89be',
+    '3683a58d8a6836175aa946afc026930b79a57204',
+    '2d9dad1b821abffb3fd9e12a2d585f77bc0d5ff9',
+    'e321560ac819c05274c59f46f5cc28ccfd4b38ec',
 
     ]
 
