@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007, 2017, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2007, 2018, Oracle and/or its affiliates. All rights reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -46,6 +46,12 @@ _date = "@DATE@"
 import sys, os, re, urllib, urllib2
 from mercurial.node import *
 from mercurial import cmdutil, patch, util, context, templater
+try:
+    # Mercurial 4.3 and higher
+    from mercurial import registrar
+except ImportError:
+    registrar = {}
+    pass
 
 Pass = False
 Fail = True
@@ -718,7 +724,9 @@ def strict_hook(ui, repo, hooktype, node=None, source=None, **opts):
 # decorator. If this isn't available, fallback on a simple local implementation
 # that just adds the data to the cmdtable.
 cmdtable = {}
-if hasattr(cmdutil, 'command'):
+if hasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+elif hasattr(cmdutil, 'command'):
     command = cmdutil.command(cmdtable)
 else:
     def command(name, options, synopsis):
