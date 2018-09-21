@@ -43,7 +43,7 @@
 _version = "@VERSION@"
 _date = "@DATE@"
 
-import sys, os, re, urllib, urllib2
+import sys, os, re, urllib, urllib2, json
 from mercurial.node import *
 from mercurial import cmdutil, context, error, patch, templater, util, utils
 try:
@@ -137,26 +137,29 @@ def load_conf(root):
 
 # Author validation
 
-author_cache = { }                      ## Should really cache more permanently
+author_cache = None
 
-def validate_author(an, pn):
-  if author_cache.has_key(an):
-    return True
-  u = ("http://db.openjdk.java.net/people/%s/projects/%s"
-       % (urllib.quote(an), pn))
-  f = None
-  try:
-      try:
-          f = urllib2.urlopen(u)
-      except urllib2.HTTPError, e:
-          if e.code == 404:
-              return False
-          raise e
-  finally:
-      if f:
-          f.close()
-  author_cache[an] = True
-  return True
+def load_authors(ui):
+    global author_cache
+    ui.debug("Loading author names ...\n")
+    u = "https://db.openjdk.java.net/people"
+    author_cache = { }
+    f = None
+    try:
+        req = urllib2.Request(u)
+        req.add_header("Accept", "application/json")
+        f = urllib2.urlopen(req)
+        j = json.load(f)
+        for p in j:
+            author_cache[p['name']] = True
+    finally:
+        if f:
+            f.close()
+
+def validate_author(ui, an, pn):
+    if not author_cache:
+        load_authors(ui)
+    return author_cache.has_key(an)
 
 
 # Whitespace and comment validation
@@ -204,7 +207,7 @@ def bug_validate(ch, ctx, m, pn):
 def rev_validate(ch, ctx, m, pn):
     ans = re.split(", *", m.group(1))
     for an in ans:
-        if not validate_author(an, pn) or an == "duke":
+        if not validate_author(ch.ui, an, pn) or an == "duke":
             ch.error(ctx, "Invalid reviewer name: %s" % an)
         ch.cs_reviewers.append(an)
 
@@ -251,6 +254,7 @@ def repo_bugids(ui, repo):
     # Should cache this, eventually
     bugids = { }                        # bugid -> rev
     opts = { 'rev' : ['0:tip'] }
+    ui.debug("Gathering bugids ...\n")
     try:
         nop = lambda c, fns: None
         iter = cmdutil.walkchangerevs(repo, _matchall(repo), opts, nop)
@@ -527,8 +531,8 @@ class checker(object):
         self.bugids_ignore = False
         if self.conf.get("bugids") == "ignore":
             self.bugids_ignore = True
-        if not self.bugids_ignore:
-            # only identify bug ids if we are going to use them
+        if not self.bugids_ignore and not self.bugids_allow_dups:
+            # only gather bug ids if we are going to use them
             self.repo_bugids = repo_bugids(ui, repo)
         self.blacklist = dict.fromkeys(changeset_blacklist)
         self.read_blacklist(blacklist_file)
@@ -569,8 +573,7 @@ class checker(object):
         self.rv = Fail
 
     def c_00_author(self, ctx):
-        self.ui.debug("author: %s\n" % ctx.user())
-        if not validate_author(ctx.user(), self.conf["project"]):
+        if not validate_author(self.ui, ctx.user(), self.conf["project"]):
             self.error(ctx, "Invalid changeset author: %s" % ctx.user())
         self.cs_author = ctx.user()
 
