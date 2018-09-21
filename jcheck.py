@@ -45,7 +45,7 @@ _date = "@DATE@"
 
 import sys, os, re, urllib, urllib2
 from mercurial.node import *
-from mercurial import cmdutil, patch, util, context, templater
+from mercurial import cmdutil, context, error, patch, templater, util, utils
 try:
     # Mercurial 4.3 and higher
     from mercurial import registrar
@@ -53,12 +53,27 @@ except ImportError:
     registrar = {}
     pass
 
+# Abort() was moved/copied from util to error in hg 1.3 and was removed from
+# util in 4.6.
+error_Abort = None
+if hasattr(error, 'Abort'):
+    error_Abort = error.Abort
+else:
+    error_Abort = util.Abort
+
+# date-related utils moved to utils/dateutil in early 2018 (hg 4.7)
+dateutil_datestr = None
+if hasattr(utils, 'dateutil'):
+    dateutil_datestr = utils.dateutil.datestr
+else:
+    dateutil_datestr = util.datestr
+
 Pass = False
 Fail = True
 
 def datestr(ctx):
     # Mercurial 0.9.5 and earlier append a time zone; strip it.
-    return util.datestr(ctx.date(), format="%Y-%m-%d %H:%M")[:16]
+    return dateutil_datestr(ctx.date(), format="%Y-%m-%d %H:%M")[:16]
 
 def oneline(ctx):
     return ("%5d:%s  %-12s  %s  %s\n"
@@ -109,14 +124,14 @@ def load_conf(root):
                 continue
             m = prop_re.match(ln)
             if not m:
-                raise util.Abort("%s:%d: Invalid configuration syntax: %s"
+                raise error_Abort("%s:%d: Invalid configuration syntax: %s"
                                  % (fn, i, ln))
             cf[m.group(1)] = m.group(2)
     finally:
         f.close()
     for pn in ["project"]:
         if not cf.has_key(pn):
-            raise util.Abort("%s: Missing property: %s" % (fn, pn))
+            raise error_Abort("%s: Missing property: %s" % (fn, pn))
     return cf
 
 
@@ -693,7 +708,7 @@ def hook(ui, repo, hooktype, node=None, source=None, **opts):
     ui.debug("jcheck: node %s, source %s, args %s\n" % (node, source, opts))
     repocompat(repo)
     if not repo.local():
-        raise util.Abort("repository '%s' is not local" % repo.path)
+        raise error_Abort("repository '%s' is not local" % repo.path)
     if not os.path.exists(os.path.join(repo.root, ".jcheck")):
         ui.note("jcheck not enabled (no .jcheck in repository root); skipping\n")
         return Pass
@@ -747,7 +762,7 @@ def jcheck(ui, repo, **opts):
     ui.debug("jcheck repo=%s opts=%s\n" % (repo.path, opts))
     repocompat(repo)
     if not repo.local():
-        raise util.Abort("repository '%s' is not local" % repo.path)
+        raise error_Abort("repository '%s' is not local" % repo.path)
     if not os.path.exists(os.path.join(repo.root, ".jcheck")):
         ui.status("jcheck not enabled (no .jcheck in repository root)\n")
         return Pass
