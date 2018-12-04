@@ -126,6 +126,8 @@ HG='hg --config hooks.pretxncommit.jcheck=python:jcheck.hook'
 for t in foo tiptoe jdk7 jdk7-b1 "$whitespace_tag" \
          hs1-b02 hs11-b3 hs12-b004 hs13.001-b05 \
          jdk- jdk-9u1 jdk-9-1 jdk-9.01 \
+         jdk8u8-GA jdk-9+100-gav hs13.10-b12-g \
+         jdk8u8-b08-ga jdk-10.0.2+2-ga \
         jdk6u22 jdk6u-b01 jdk6u11-b1 jdk6u1000-b01 ; do
   echo "-- $r tag $t"
   if HGUSER=$setup_author $HG tag -r 1 "$t"; then hg rollback; fail $r; fi
@@ -141,6 +143,7 @@ for t in jdk4-b01 jdk5-b01 jdk6-b01 jdk7-b01 jdk8-b01 jdk9-b01 \
         jdk4u4-b04 jdk5u5-b05 jdk6u6-b06 jdk7u7-b07 jdk8u8-b08 jdk9u9-b09 \
         jdk8u80-b08 jdk8u100-b100 \
         jdk-9+100 jdk-9.1.2.1+3 jdk-9.0.1+42 jdk-9.0.1.19+43 \
+        jdk-9-ga jdk-11.0.2-ga jdk8u192-ga \
         hs11-b02 hs12.1-b11 hs13.10-b12 ; do
   echo "-- $r tag $t"
   if ! HGUSER=$setup_author $HG tag -r 1 "$t"; then fail $r; fi
