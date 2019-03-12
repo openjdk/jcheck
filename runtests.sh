@@ -144,7 +144,7 @@ for t in jdk4-b01 jdk5-b01 jdk6-b01 jdk7-b01 jdk8-b01 jdk9-b01 \
         jdk4u4-b04 jdk5u5-b05 jdk6u6-b06 jdk7u7-b07 jdk8u8-b08 jdk9u9-b09 \
         jdk8u80-b08 jdk8u100-b100 \
         jdk-9+100 jdk-9.1.2.1+3 jdk-9.0.1+42 jdk-9.0.1.19+43 \
-        jdk-9-ga jdk-11.0.2-ga jdk8u192-ga \
+        jdk-9-ga jdk-11.0.2-ga jdk-11.0.2.0.1-ga jdk8u192-ga \
         hs11-b02 hs12.1-b11 hs13.10-b12 ; do
   echo "-- $r tag $t"
   if ! HGUSER=$setup_author $HG tag -r 1 "$t"; then fail $r; fi
