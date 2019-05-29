@@ -43,7 +43,7 @@
 _version = "@VERSION@"
 _date = "@DATE@"
 
-import sys, os, re, urllib, urllib2, json
+import sys, os, re, urllib, urllib2, json, inspect
 from mercurial.node import *
 from mercurial import cmdutil, context, error, patch, templater, util, utils
 try:
@@ -678,13 +678,16 @@ class checker(object):
         if hash in self.blacklist:
             self.error(ctx, "Blacklisted changeset: " + hash)
 
-    def check(self, node):
+    def check(self, rev, node):
         self.summarized = False
         self.cs_bugids = [ ]
         self.cs_author = None
         self.cs_reviewers = [ ]
         self.cs_contributor = None
-        ctx = context.changectx(self.repo, node)
+        if len(inspect.getargspec(context.changectx.__init__).args) == 4:
+            ctx = context.changectx(self.repo, rev, node)
+        else:
+            ctx = context.changectx(self.repo, node)
         self.ui.note(oneline(ctx))
         if hex(node) in changeset_whitelist:
             self.ui.note("%s in whitelist; skipping\n" % hex(node))
@@ -741,7 +744,7 @@ def hook(ui, repo, hooktype, node=None, source=None, **opts):
     end = (hasattr(repo.changelog, 'count') and repo.changelog.count() or
            len(repo.changelog))
     for rev in xrange(start, end):
-        ch.check(repo.changelog.node(rev))
+        ch.check(rev, repo.changelog.node(rev))
     if ch.rv == Fail:
         ui.status("\n")
     return ch.rv
@@ -798,7 +801,7 @@ def jcheck(ui, repo, **opts):
         nop = lambda c, fns: None
         iter = cmdutil.walkchangerevs(repo, _matchall(repo), opts, nop)
         for ctx in iter:
-            ch.check(ctx.node())
+            ch.check(ctx, ctx.node())
     except (AttributeError, TypeError):
         # AttributeError:  matchall does not exist in hg < 1.1
         # TypeError:  walkchangerevs args differ in hg <= 1.3.1
@@ -811,7 +814,7 @@ def jcheck(ui, repo, **opts):
                 node = repo.changelog.node(rev)
                 if ui.debugflag:
                     displayer.show(rev, node, copies=False)
-                ch.check(node)
+                ch.check(rev, node)
             elif st == 'iter':
                 if ui.debugflag:
                     displayer.flush(rev)
