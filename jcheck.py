@@ -801,7 +801,7 @@ def jcheck(ui, repo, **opts):
         nop = lambda c, fns: None
         iter = cmdutil.walkchangerevs(repo, _matchall(repo), opts, nop)
         for ctx in iter:
-            ch.check(ctx, ctx.node())
+            ch.check(ctx.rev(), ctx.node())
     except (AttributeError, TypeError):
         # AttributeError:  matchall does not exist in hg < 1.1
         # TypeError:  walkchangerevs args differ in hg <= 1.3.1
