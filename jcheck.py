@@ -707,10 +707,25 @@ class checker(object):
                     self.error(None,
                                "Illegal tag name: %s" % t)
 
-        bs = self.repo.branchmap()
-        if len(bs) > 1:
-            bs = bs.copy()
-            del bs["default"]
+        # Check for non default branches
+        if hasattr(self.repo.branchmap(), 'iterbranches'):
+            bs = {}
+            for n, h, t, c in self.repo.branchmap().iterbranches():
+                if n != "default":
+                    bs[n] = n
+            if len(bs) < 1:
+                bs = None
+        else:
+            # hg version 3.x and earlier: Peek at the internal dict of
+            # branches
+            bs = self.repo.branchmap()
+            if len(bs) > 1:
+                bs = bs.copy()
+                del bs["default"]
+            else:
+                bs = None
+
+        if bs is not None:
             self.error(None,
                        "Named branches not permitted; this repository has: %s"
                        % ", ".join(bs.keys()))
