@@ -27,6 +27,12 @@
 import sys, os, re, urllib, urllib2
 from mercurial.node import *
 from mercurial import cmdutil, patch, util, context, templater
+try:
+    # Mercurial 4.3 and higher
+    from mercurial import registrar
+except ImportError:
+    registrar = {}
+    pass
 
 # Extend the path so that we can import the jcheck extension itself
 sys.path.insert(0, os.path.dirname(__file__))
@@ -36,7 +42,9 @@ import jcheck
 # decorator. If this isn't available, fallback on a simple local implementation
 # that just adds the data to the cmdtable.
 cmdtable = {}
-if hasattr(cmdutil, 'command'):
+if hasattr(registrar, 'command'):
+    command = registrar.command(cmdtable)
+elif hasattr(cmdutil, 'command'):
     command = cmdutil.command(cmdtable)
 else:
     def command(name, options, synopsis):
