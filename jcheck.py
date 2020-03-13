@@ -645,9 +645,8 @@ class checker(object):
                 self.error(ctx, "Extraneous text in comment")
 
     def c_02_files(self, ctx):
-        changes = self.repo.status(ctx.parents()[0].node(),
-                                   ctx.node(), None)[:5]
-        modified, added = changes[:2]
+        status = self.repo.status(ctx.parents()[0].node(), ctx.node(), None)
+        modified, added = tuple(status)[:2]
         # ## Skip files that were renamed but not modified
         files = modified + added
         if self.ui.debugflag:
@@ -684,10 +683,10 @@ class checker(object):
         self.cs_author = None
         self.cs_reviewers = [ ]
         self.cs_contributor = None
-        if len(inspect.getargspec(context.changectx.__init__).args) == 4:
-            ctx = context.changectx(self.repo, rev, node)
-        else:
+        try:
             ctx = context.changectx(self.repo, node)
+        except TypeError:
+            ctx = context.changectx(self.repo, rev, node)
         self.ui.note(oneline(ctx))
         if hex(node) in changeset_whitelist:
             self.ui.note("%s in whitelist; skipping\n" % hex(node))
